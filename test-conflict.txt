@@ -1,0 +1,7 @@
+This is fine
+<<<<<<< HEAD
+console.log("ours")
+=======
+console.log("theirs")
+>>>>>>> branch-name
+This is also fine
