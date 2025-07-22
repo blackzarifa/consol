@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
+	"regexp"
 )
 
 func main() {
@@ -17,9 +17,11 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	content := string(file)
 
-	if !strings.Contains(content, "<<<<<<< HEAD") {
+	content := string(file)
+	regex := regexp.MustCompile(`(?m)^<{7} \S*`)
+
+	if !regex.MatchString(content) {
 		fmt.Println("No conflicts found!")
 		return
 	}
