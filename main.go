@@ -22,7 +22,7 @@ func main() {
 	regex := regexp.MustCompile(`(?m)^<{7} \S*`)
 
 	if !regex.MatchString(content) {
-		fmt.Println("No conflicts found!")
+		fmt.Println("No conflicts found.")
 		return
 	}
 }
