@@ -1,4 +1,4 @@
-package main
+package parser
 
 import (
 	"regexp"
@@ -16,7 +16,7 @@ var (
 	endConflict   = regexp.MustCompile(`(?m)^>{7} \S*`)
 )
 
-func HasConflict(content string) {
+func HasConflict(content string) bool {
 	if !startConflict.MatchString(content) {
 		return false
 	}
@@ -25,5 +25,5 @@ func HasConflict(content string) {
 
 func ParseFile(content string) ([]Conflict, string) {
 	// TODO
-	return []Conflict{}
+	return []Conflict{}, ""
 }
