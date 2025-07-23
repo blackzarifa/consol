@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"regexp"
+
+	"github.com/blackzarifa/consol/parser"
 )
 
 func main() {
@@ -17,11 +18,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	content := string(file)
-	regex := regexp.MustCompile(`(?m)^<{7} \S*`)
 
-	if !regex.MatchString(content) {
+	if !parser.HasConflict(content) {
 		fmt.Println("No conflicts found.")
 		return
 	}
