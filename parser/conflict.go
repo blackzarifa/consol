@@ -13,7 +13,7 @@ type Conflict struct {
 
 var (
 	conflictStart     = regexp.MustCompile(`(?m)^<{7} \S*`)
-	conflictSeparator = regexp.MustCompile(`(?m)^={7}\S$`)
+	conflictSeparator = regexp.MustCompile(`(?m)^={7}$`)
 	conflictEnd       = regexp.MustCompile(`(?m)^>{7} \S*`)
 )
 
