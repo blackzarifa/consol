@@ -32,9 +32,16 @@ func ParseFile(content string) ([]Conflict, string) {
 	separatorIndexes := conflictSeparator.FindAllStringIndex(content, -1)
 	endIndexes := conflictEnd.FindAllStringIndex(content, -1)
 
-	fmt.Println(startIndexes)
-	fmt.Println(separatorIndexes)
-	fmt.Println(endIndexes)
+	for i, start := range startIndexes {
+		if i >= len(separatorIndexes) || i >= len(endIndexes) {
+			break
+		}
+
+		separator := separatorIndexes[i]
+		end := endIndexes[i]
+
+		fmt.Println(start, separator, end)
+	}
 
 	return conflicts, ""
 }
