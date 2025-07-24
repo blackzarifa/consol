@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"regexp"
 )
 
@@ -25,7 +26,10 @@ func HasConflict(content string) bool {
 }
 
 func ParseFile(content string) ([]Conflict, string) {
-	var conflicts = []Conflict
+	var conflicts []Conflict
+
+	startIndexes := conflictStart.FindAllStringIndex(content, -1)
+	fmt.Println(startIndexes)
 
 	return conflicts, ""
 }

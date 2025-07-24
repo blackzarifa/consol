@@ -24,4 +24,6 @@ func main() {
 		fmt.Println("No conflicts found.")
 		return
 	}
+
+	parser.ParseFile(content)
 }
