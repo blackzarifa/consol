@@ -12,18 +12,20 @@ type Conflict struct {
 }
 
 var (
-	startConflict = regexp.MustCompile(`(?m)^<{7} \S*`)
-	endConflict   = regexp.MustCompile(`(?m)^>{7} \S*`)
+	conflictStart     = regexp.MustCompile(`(?m)^<{7} \S*`)
+	conflictSeparator = regexp.MustCompile(`(?m)^={7}\S$`)
+	conflictEnd       = regexp.MustCompile(`(?m)^>{7} \S*`)
 )
 
 func HasConflict(content string) bool {
-	if !startConflict.MatchString(content) {
+	if !conflictStart.MatchString(content) {
 		return false
 	}
 	return true
 }
 
 func ParseFile(content string) ([]Conflict, string) {
-	// TODO
-	return []Conflict{}, ""
+	var conflicts = []Conflict
+
+	return conflicts, ""
 }
