@@ -25,14 +25,13 @@ func getLineNumber(content string, pos int) int {
 			line++
 			continue
 		}
-		// if content[i] == '\r' {
-		// 	if content[i+1] == '\n' {
-		// 		line += 2
-		// 		continue
-		// 	}
-		// 	line++
-		// 	continue
-		// }
+
+		if content[i] == '\r' {
+			if content[i+1] == '\n' {
+				i++
+			}
+			line++
+		}
 	}
 	return line
 }
