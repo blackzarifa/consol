@@ -5,3 +5,11 @@ console.log("ours")
 console.log("theirs")
 >>>>>>> branch-name
 This is also fine
+
+Again this is fine
+<<<<<<< HEAD
+console.log("ours 2")
+=======
+console.log("theirs 2")
+>>>>>>> branch-name
+This is also fine 2
