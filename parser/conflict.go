@@ -18,6 +18,25 @@ var (
 	conflictEnd       = regexp.MustCompile(`(?m)^>{7}( .*)?`)
 )
 
+func getLineNumber(content string, pos int) int {
+	line := 1
+	for i := 0; i < pos && i < len(content); i++ {
+		if content[i] == '\n' {
+			line++
+			continue
+		}
+		// if content[i] == '\r' {
+		// 	if content[i+1] == '\n' {
+		// 		line += 2
+		// 		continue
+		// 	}
+		// 	line++
+		// 	continue
+		// }
+	}
+	return line
+}
+
 func HasConflict(content string) bool {
 	if !conflictStart.MatchString(content) {
 		return false
@@ -40,7 +59,11 @@ func ParseFile(content string) ([]Conflict, string) {
 		separator := separatorIndexes[i]
 		end := endIndexes[i]
 
-		fmt.Println(start, separator, end)
+		startLine := getLineNumber(content, start[0])
+		separatorLine := getLineNumber(content, separator[0])
+		endLine := getLineNumber(content, end[0])
+
+		fmt.Println(startLine, separatorLine, endLine)
 	}
 
 	return conflicts, ""
