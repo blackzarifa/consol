@@ -59,10 +59,16 @@ func ParseFile(content string) ([]Conflict, string) {
 		end := endIndexes[i]
 
 		startLine := getLineNumber(content, start[0])
-		separatorLine := getLineNumber(content, separator[0])
 		endLine := getLineNumber(content, end[0])
+		ours := content[start[1]+1 : separator[0]-1]
+		theirs := content[separator[1]+1 : end[0]-1]
 
-		fmt.Println(startLine, separatorLine, endLine)
+		conflict := Conflict{StartLine: startLine, EndLine: endLine, Ours: ours, Theirs: theirs}
+		conflicts = append(conflicts, conflict)
+		fmt.Println(conflict.Ours)
+		fmt.Println("----------------")
+		fmt.Println(conflict.Theirs)
+		fmt.Println("================")
 	}
 
 	return conflicts, ""
