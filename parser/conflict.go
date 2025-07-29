@@ -6,8 +6,8 @@ import (
 )
 
 type Conflict struct {
-	Startline int
-	Endline   int
+	StartLine int
+	EndLine   int
 	Ours      string
 	Theirs    string
 }
