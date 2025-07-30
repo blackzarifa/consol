@@ -3,6 +3,7 @@ package parser
 import (
 	"fmt"
 	"regexp"
+	"strings"
 )
 
 type Conflict struct {
@@ -46,9 +47,17 @@ func HasConflict(content string) bool {
 func ParseFile(content string) ([]Conflict, string) {
 	var conflicts []Conflict
 
-	startIndexes := conflictStart.FindAllStringIndex(content, -1)
-	separatorIndexes := conflictSeparator.FindAllStringIndex(content, -1)
-	endIndexes := conflictEnd.FindAllStringIndex(content, -1)
+	lineEnding := "\n"
+	if strings.Contains(content, "\r\n") {
+		lineEnding = "\r\n"
+	} else if strings.Contains(content, "\r") {
+		lineEnding = "\r"
+	}
+	normalized := strings.ReplaceAll(content, lineEnding, "\n")
+
+	startIndexes := conflictStart.FindAllStringIndex(normalized, -1)
+	separatorIndexes := conflictSeparator.FindAllStringIndex(normalized, -1)
+	endIndexes := conflictEnd.FindAllStringIndex(normalized, -1)
 
 	for i, start := range startIndexes {
 		if i >= len(separatorIndexes) || i >= len(endIndexes) {
@@ -58,10 +67,10 @@ func ParseFile(content string) ([]Conflict, string) {
 		separator := separatorIndexes[i]
 		end := endIndexes[i]
 
-		startLine := getLineNumber(content, start[0])
-		endLine := getLineNumber(content, end[0])
-		ours := content[start[1]+1 : separator[0]-1]
-		theirs := content[separator[1]+1 : end[0]-1]
+		startLine := getLineNumber(normalized, start[0])
+		endLine := getLineNumber(normalized, end[0])
+		ours := normalized[start[1]+1 : separator[0]-1]
+		theirs := normalized[separator[1]+1 : end[0]-1]
 
 		conflict := Conflict{StartLine: startLine, EndLine: endLine, Ours: ours, Theirs: theirs}
 		conflicts = append(conflicts, conflict)
