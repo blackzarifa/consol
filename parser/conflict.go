@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"regexp"
 	"strings"
 )
@@ -51,6 +50,16 @@ func normalizeLineEndings(content string) (normalized, lineEnding string) {
 	return
 }
 
+// Parses a Conflict from a content string and start, separator and end indexes
+func parseConflict(content string, start, separator, end []int) Conflict {
+	startLine := getLineNumber(content, start[0])
+	endLine := getLineNumber(content, end[0])
+	ours := content[start[1]+1 : separator[0]-1]
+	theirs := content[separator[1]+1 : end[0]-1]
+
+	return Conflict{StartLine: startLine, EndLine: endLine, Ours: ours, Theirs: theirs}
+}
+
 func HasConflict(content string) bool {
 	if !conflictStart.MatchString(content) {
 		return false
@@ -76,18 +85,9 @@ func ParseFile(content string) ([]Conflict, string) {
 		separator := separatorIndexes[i]
 		end := endIndexes[i]
 
-		startLine := getLineNumber(normalized, start[0])
-		endLine := getLineNumber(normalized, end[0])
-		ours := normalized[start[1]+1 : separator[0]-1]
-		theirs := normalized[separator[1]+1 : end[0]-1]
-
-		conflict := Conflict{StartLine: startLine, EndLine: endLine, Ours: ours, Theirs: theirs}
+		conflict := parseConflict(normalized, start, separator, end)
 		conflicts = append(conflicts, conflict)
-		fmt.Println(conflict.Ours)
-		fmt.Println("----------------")
-		fmt.Println(conflict.Theirs)
-		fmt.Println("================")
 	}
 
-	return conflicts, ""
+	return conflicts, lineEnding
 }
