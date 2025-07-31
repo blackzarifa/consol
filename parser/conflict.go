@@ -37,6 +37,20 @@ func getLineNumber(content string, pos int) int {
 	return line
 }
 
+// Normalized all line endings in content to \n -
+// Returns the normalized string and the original line ending
+func normalizeLineEndings(content string) (normalized, lineEnding string) {
+	lineEnding = "\n"
+	if strings.Contains(content, "\r\n") {
+		lineEnding = "\r\n"
+	} else if strings.Contains(content, "\r") {
+		lineEnding = "\r"
+	}
+	normalized = strings.ReplaceAll(content, lineEnding, "\n")
+
+	return
+}
+
 func HasConflict(content string) bool {
 	if !conflictStart.MatchString(content) {
 		return false
@@ -44,16 +58,11 @@ func HasConflict(content string) bool {
 	return true
 }
 
+// Parses an entire file string to return an array of Conflict
 func ParseFile(content string) ([]Conflict, string) {
 	var conflicts []Conflict
 
-	lineEnding := "\n"
-	if strings.Contains(content, "\r\n") {
-		lineEnding = "\r\n"
-	} else if strings.Contains(content, "\r") {
-		lineEnding = "\r"
-	}
-	normalized := strings.ReplaceAll(content, lineEnding, "\n")
+	normalized, lineEnding := normalizeLineEndings(content)
 
 	startIndexes := conflictStart.FindAllStringIndex(normalized, -1)
 	separatorIndexes := conflictSeparator.FindAllStringIndex(normalized, -1)
