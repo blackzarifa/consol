@@ -46,7 +46,6 @@ func normalizeLineEndings(content string) (normalized, lineEnding string) {
 		lineEnding = "\r"
 	}
 	normalized = strings.ReplaceAll(content, lineEnding, "\n")
-
 	return
 }
 
