@@ -56,7 +56,12 @@ func parseConflict(content string, start, separator, end []int) Conflict {
 	ours := content[start[1]+1 : separator[0]-1]
 	theirs := content[separator[1]+1 : end[0]-1]
 
-	return Conflict{StartLine: startLine, EndLine: endLine, Ours: ours, Theirs: theirs}
+	return Conflict{
+		StartLine: startLine,
+		EndLine:   endLine,
+		Ours:      ours,
+		Theirs:    theirs,
+	}
 }
 
 func HasConflict(content string) bool {
@@ -66,7 +71,8 @@ func HasConflict(content string) bool {
 	return true
 }
 
-// Parses an entire file string to return an array of Conflict
+// Parses an entire file string to return an array of Conflict and the file line
+// ending
 func ParseFile(content string) ([]Conflict, string) {
 	var conflicts []Conflict
 
