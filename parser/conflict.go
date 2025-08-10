@@ -18,26 +18,41 @@ var (
 	conflictEnd       = regexp.MustCompile(`(?m)^>{7}( .*)?`)
 )
 
-func getLineNumber(content string, pos int) int {
-	line := 1
-	for i := 0; i < pos && i < len(content); i++ {
-		if content[i] == '\n' {
-			line++
-			continue
-		}
-
-		if content[i] == '\r' {
-			if content[i+1] == '\n' {
-				i++
-			}
-			line++
-		}
+func HasConflict(content string) bool {
+	if !conflictStart.MatchString(content) {
+		return false
 	}
-	return line
+	return true
 }
 
-// Normalized all line endings in content to \n -
-// Returns the normalized string and the original line ending
+// Parses an entire file string to return conflicts, normalized content, and
+// line ending
+func ParseFile(content string) ([]Conflict, string, string) {
+	var conflicts []Conflict
+
+	normalized, lineEnding := normalizeLineEndings(content)
+
+	startIndexes := conflictStart.FindAllStringIndex(normalized, -1)
+	separatorIndexes := conflictSeparator.FindAllStringIndex(normalized, -1)
+	endIndexes := conflictEnd.FindAllStringIndex(normalized, -1)
+
+	for i, start := range startIndexes {
+		if i >= len(separatorIndexes) || i >= len(endIndexes) {
+			break
+		}
+
+		separator := separatorIndexes[i]
+		end := endIndexes[i]
+
+		conflict := parseConflict(normalized, start, separator, end)
+		conflicts = append(conflicts, conflict)
+	}
+
+	return conflicts, normalized, lineEnding
+}
+
+// Normalizes all line endings in content to \n then returns the normalized
+// string and the original line ending
 func normalizeLineEndings(content string) (normalized, lineEnding string) {
 	lineEnding = "\n"
 	if strings.Contains(content, "\r\n") {
@@ -64,34 +79,20 @@ func parseConflict(content string, start, separator, end []int) Conflict {
 	}
 }
 
-func HasConflict(content string) bool {
-	if !conflictStart.MatchString(content) {
-		return false
-	}
-	return true
-}
-
-// Parses an entire file string to return an array of Conflict
-func ParseFile(content string) []Conflict {
-	var conflicts []Conflict
-
-	normalized, _ := normalizeLineEndings(content)
-
-	startIndexes := conflictStart.FindAllStringIndex(normalized, -1)
-	separatorIndexes := conflictSeparator.FindAllStringIndex(normalized, -1)
-	endIndexes := conflictEnd.FindAllStringIndex(normalized, -1)
-
-	for i, start := range startIndexes {
-		if i >= len(separatorIndexes) || i >= len(endIndexes) {
-			break
+func getLineNumber(content string, pos int) int {
+	line := 1
+	for i := 0; i < pos && i < len(content); i++ {
+		if content[i] == '\n' {
+			line++
+			continue
 		}
 
-		separator := separatorIndexes[i]
-		end := endIndexes[i]
-
-		conflict := parseConflict(normalized, start, separator, end)
-		conflicts = append(conflicts, conflict)
+		if content[i] == '\r' {
+			if content[i+1] == '\n' {
+				i++
+			}
+			line++
+		}
 	}
-
-	return conflicts
+	return line
 }
