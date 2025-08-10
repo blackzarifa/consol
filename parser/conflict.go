@@ -71,12 +71,11 @@ func HasConflict(content string) bool {
 	return true
 }
 
-// Parses an entire file string to return an array of Conflict and the file line
-// ending
-func ParseFile(content string) ([]Conflict, string) {
+// Parses an entire file string to return an array of Conflict
+func ParseFile(content string) []Conflict {
 	var conflicts []Conflict
 
-	normalized, lineEnding := normalizeLineEndings(content)
+	normalized, _ := normalizeLineEndings(content)
 
 	startIndexes := conflictStart.FindAllStringIndex(normalized, -1)
 	separatorIndexes := conflictSeparator.FindAllStringIndex(normalized, -1)
@@ -94,5 +93,5 @@ func ParseFile(content string) ([]Conflict, string) {
 		conflicts = append(conflicts, conflict)
 	}
 
-	return conflicts, lineEnding
+	return conflicts
 }
