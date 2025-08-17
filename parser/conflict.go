@@ -19,10 +19,7 @@ var (
 )
 
 func HasConflict(content string) bool {
-	if !conflictStart.MatchString(content) {
-		return false
-	}
-	return true
+	return conflictStart.MatchString(content)
 }
 
 // Parses an entire file string to return conflicts, normalized content, and
