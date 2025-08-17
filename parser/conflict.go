@@ -1,3 +1,4 @@
+// Package parser has utilities for parsing files and checking for conflicts
 package parser
 
 import (
@@ -22,7 +23,7 @@ func HasConflict(content string) bool {
 	return conflictStart.MatchString(content)
 }
 
-// Parses an entire file string to return conflicts, normalized content, and
+// ParseFile parses an entire file string to return conflicts, normalized content, and
 // line ending
 func ParseFile(content string) ([]Conflict, string, string) {
 	var conflicts []Conflict
