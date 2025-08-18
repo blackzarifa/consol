@@ -7,7 +7,6 @@ import (
 
 	"github.com/blackzarifa/consol/parser"
 	"github.com/blackzarifa/consol/tui"
-	tea "github.com/charmbracelet/bubbletea"
 )
 
 func main() {
@@ -29,9 +28,5 @@ func main() {
 
 	conflicts, normalized, lineEnding := parser.ParseFile(content)
 
-	p := tea.NewProgram(tui.InitialModel(normalized, lineEnding, conflicts))
-	if _, err := p.Run(); err != nil {
-		fmt.Printf("Alas, there's been an error: %v", err)
-		os.Exit(1)
-	}
+	tui.RunProgram(normalized, lineEnding, conflicts)
 }

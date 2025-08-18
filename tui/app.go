@@ -3,6 +3,7 @@ package tui
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/blackzarifa/consol/parser"
 	tea "github.com/charmbracelet/bubbletea"
@@ -15,14 +16,11 @@ type model struct {
 	conflicts  []parser.Conflict
 }
 
-func InitialModel(
-	normalized, lineEnding string,
-	conflicts []parser.Conflict,
-) model {
-	return model{
-		normalized: normalized,
-		lineEnding: lineEnding,
-		conflicts:  conflicts,
+func RunProgram(normalized, lineEnding string, conflicts []parser.Conflict) {
+	p := tea.NewProgram(initialModel(normalized, lineEnding, conflicts))
+	if _, err := p.Run(); err != nil {
+		fmt.Printf("Alas, there's been an error: %v", err)
+		os.Exit(1)
 	}
 }
 
@@ -56,4 +54,15 @@ func (m model) View() string {
 	s += fmt.Sprintf("\nOriginal line ending: %q\n", m.lineEnding)
 	s += "Press 'q' to quit\n"
 	return s
+}
+
+func initialModel(
+	normalized, lineEnding string,
+	conflicts []parser.Conflict,
+) model {
+	return model{
+		normalized: normalized,
+		lineEnding: lineEnding,
+		conflicts:  conflicts,
+	}
 }
