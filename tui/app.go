@@ -10,14 +10,19 @@ import (
 )
 
 type model struct {
-	cursor     int
-	normalized string
-	lineEnding string
-	conflicts  []parser.Conflict
+	conflicts    []parser.Conflict
+	currentIndex int
+	cursor       int
+	normalized   string
+	lineEnding   string
 }
 
 func RunProgram(normalized, lineEnding string, conflicts []parser.Conflict) {
-	p := tea.NewProgram(initialModel(normalized, lineEnding, conflicts))
+	p := tea.NewProgram(
+		initialModel(normalized, lineEnding, conflicts),
+		tea.WithAltScreen(),
+		tea.WithMouseCellMotion(),
+	)
 	if _, err := p.Run(); err != nil {
 		fmt.Printf("Alas, there's been an error: %v", err)
 		os.Exit(1)
@@ -42,16 +47,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m model) View() string {
 	s := "=== CONSOL CONFLICT RESOLVER ===\n\n"
-	s += "File content:\n---\n"
+
 	s += m.normalized
-	s += "\n---\n\n"
 
-	s += fmt.Sprintf("Found %d conflicts:\n", len(m.conflicts))
-	for i, c := range m.conflicts {
-		s += fmt.Sprintf("  %d. Lines %d-%d\n", i+1, c.StartLine, c.EndLine)
-	}
-
-	s += fmt.Sprintf("\nOriginal line ending: %q\n", m.lineEnding)
 	s += "Press 'q' to quit\n"
 	return s
 }
