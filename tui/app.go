@@ -14,6 +14,7 @@ type model struct {
 	conflicts  []parser.Conflict
 	normalized string
 	lineEnding string
+	cursor     int
 	height     int
 	offset     int
 }
@@ -58,6 +59,12 @@ func (m model) View() string {
 		if i >= m.height-5 {
 			break
 		}
+
+		if i == m.cursor {
+			s += fmt.Sprintf(">>> %s <<<\n", lines[i])
+			continue
+		}
+
 		s += lines[i] + "\n"
 	}
 
@@ -70,8 +77,10 @@ func initialModel(
 	conflicts []parser.Conflict,
 ) model {
 	return model{
+		conflicts:  conflicts,
 		normalized: normalized,
 		lineEnding: lineEnding,
-		conflicts:  conflicts,
+		cursor:     0,
+		offset:     0,
 	}
 }
