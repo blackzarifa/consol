@@ -45,6 +45,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "ctrl+c", "q":
 			return m, tea.Quit
+		case "k", "up":
+			if m.cursor > 0 {
+				m.cursor--
+			}
+		case "j", "down":
+			m.cursor++
 		}
 	}
 
