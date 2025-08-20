@@ -4,17 +4,18 @@ package tui
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/blackzarifa/consol/parser"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 type model struct {
-	conflicts    []parser.Conflict
-	currentIndex int
-	cursor       int
-	normalized   string
-	lineEnding   string
+	conflicts  []parser.Conflict
+	normalized string
+	lineEnding string
+	height     int
+	offset     int
 }
 
 func RunProgram(normalized, lineEnding string, conflicts []parser.Conflict) {
@@ -30,11 +31,15 @@ func RunProgram(normalized, lineEnding string, conflicts []parser.Conflict) {
 }
 
 func (m model) Init() tea.Cmd {
+	tea.SetWindowTitle("Consol - Conflict reSolver")
 	return nil
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		m.height = msg.Height
+
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":
@@ -48,9 +53,15 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m model) View() string {
 	s := "=== CONSOL CONFLICT RESOLVER ===\n\n"
 
-	s += m.normalized
+	lines := strings.Split(m.normalized, "\n")
+	for i := range lines {
+		if i >= m.height-5 {
+			break
+		}
+		s += lines[i] + "\n"
+	}
 
-	s += "Press 'q' to quit\n"
+	s += "\nPress 'q' to quit\n"
 	return s
 }
 
