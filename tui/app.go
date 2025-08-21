@@ -12,11 +12,10 @@ import (
 
 type model struct {
 	conflicts  []parser.Conflict
-	normalized string
+	normalized []string
 	lineEnding string
 	cursor     int
 	height     int
-	offset     int
 }
 
 func RunProgram(normalized, lineEnding string, conflicts []parser.Conflict) {
@@ -60,18 +59,17 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m model) View() string {
 	s := "=== CONSOL CONFLICT RESOLVER ===\n\n"
 
-	lines := strings.Split(m.normalized, "\n")
-	for i := range lines {
+	for i, line := range m.normalized {
 		if i >= m.height-5 {
 			break
 		}
 
 		if i == m.cursor {
-			s += fmt.Sprintf(">>> %s <<<\n", lines[i])
+			s += fmt.Sprintf(">>> %s <<<\n", line)
 			continue
 		}
 
-		s += lines[i] + "\n"
+		s += m.normalized[i] + "\n"
 	}
 
 	s += "\nPress 'q' to quit\n"
@@ -84,9 +82,8 @@ func initialModel(
 ) model {
 	return model{
 		conflicts:  conflicts,
-		normalized: normalized,
+		normalized: strings.Split(normalized, "\n"),
 		lineEnding: lineEnding,
 		cursor:     0,
-		offset:     0,
 	}
 }
