@@ -60,7 +60,7 @@ func (m model) View() string {
 	s := "=== CONSOL CONFLICT RESOLVER ===\n\n"
 
 	for i, line := range m.normalized {
-		if i >= m.height-5 {
+		if i >= m.height-4 {
 			break
 		}
 
@@ -72,7 +72,7 @@ func (m model) View() string {
 		s += m.normalized[i] + "\n"
 	}
 
-	s += "\nPress 'q' to quit\n"
+	s += "\nPress 'q' to quit"
 	return s
 }
 
