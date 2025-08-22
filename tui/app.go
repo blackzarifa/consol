@@ -11,16 +11,19 @@ import (
 )
 
 type model struct {
-	conflicts  []parser.Conflict
-	normalized []string
-	lineEnding string
-	cursor     int
-	height     int
+	conflicts   []parser.Conflict
+	normalized  []string
+	lineEnding  string
+	contentSize int
+	cursor      int
+	height      int
+	offset      int
 }
 
 func RunProgram(normalized, lineEnding string, conflicts []parser.Conflict) {
+	normalizedArr := strings.Split(normalized, "\n")
 	p := tea.NewProgram(
-		initialModel(normalized, lineEnding, conflicts),
+		initialModel(normalizedArr, lineEnding, conflicts),
 		tea.WithAltScreen(),
 		tea.WithMouseCellMotion(),
 	)
@@ -39,6 +42,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.height = msg.Height
+		m.contentSize = m.height - 4 // 4 is the size of the header + footnote
 
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -49,7 +53,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.cursor--
 			}
 		case "j", "down":
-			m.cursor++
+			if m.cursor < len(m.normalized) {
+				m.cursor++
+			}
 		}
 	}
 
@@ -60,15 +66,14 @@ func (m model) View() string {
 	s := "=== CONSOL CONFLICT RESOLVER ===\n\n"
 
 	for i, line := range m.normalized {
-		if i >= m.height-4 {
+		if i >= m.contentSize {
 			break
-		}
-
-		if i == m.cursor {
-			s += fmt.Sprintf(">>> %s <<<\n", line)
+		} else if i == m.cursor {
+			s += fmt.Sprintf(">>> %s <<<%d %d %d\n", line, m.contentSize, m.cursor, m.offset)
 			continue
 		}
 
+		s += fmt.Sprintf("%d  -  ", i)
 		s += m.normalized[i] + "\n"
 	}
 
@@ -77,13 +82,14 @@ func (m model) View() string {
 }
 
 func initialModel(
-	normalized, lineEnding string,
+	normalizedArr []string, lineEnding string,
 	conflicts []parser.Conflict,
 ) model {
 	return model{
 		conflicts:  conflicts,
-		normalized: strings.Split(normalized, "\n"),
+		normalized: normalizedArr,
 		lineEnding: lineEnding,
 		cursor:     0,
+		offset:     0,
 	}
 }
