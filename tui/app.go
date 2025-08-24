@@ -22,6 +22,10 @@ type model struct {
 
 func RunProgram(normalized, lineEnding string, conflicts []parser.Conflict) {
 	normalizedArr := strings.Split(normalized, "\n")
+	if len(normalizedArr) > 0 && normalizedArr[len(normalizedArr)-1] == "" {
+		normalizedArr = normalizedArr[:len(normalizedArr)-1]
+	}
+
 	p := tea.NewProgram(
 		initialModel(normalizedArr, lineEnding, conflicts),
 		tea.WithAltScreen(),
