@@ -56,6 +56,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "k", "up":
 			if m.cursor > 0 {
 				m.cursor--
+				if m.cursor < m.offset {
+					m.offset--
+				}
 			}
 		case "j", "down":
 			if m.cursor < len(m.normalized)-1 {
