@@ -44,9 +44,10 @@ func (m model) Init() tea.Cmd {
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+
 	case tea.WindowSizeMsg:
 		m.height = msg.Height
-		m.contentSize = m.height - 4 // 4 is the size of the header + footnote
+		m.contentSize = m.height - 5 // 5 is the size of the header + footnote
 
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -57,8 +58,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.cursor--
 			}
 		case "j", "down":
-			if m.cursor < len(m.normalized) {
+			if m.cursor < len(m.normalized)-1 {
 				m.cursor++
+				if m.cursor > m.contentSize+m.offset {
+					m.offset++
+				}
 			}
 		}
 	}
@@ -70,18 +74,24 @@ func (m model) View() string {
 	s := "=== CONSOL CONFLICT RESOLVER ===\n\n"
 
 	for i, line := range m.normalized {
-		if i >= m.contentSize {
+		if i > m.contentSize+m.offset {
 			break
+		} else if i < m.offset {
+			continue
 		} else if i == m.cursor {
-			s += fmt.Sprintf(">>> %s <<<%d %d %d\n", line, m.contentSize, m.cursor, m.offset)
+			s += fmt.Sprintf(">>> %s <<< %d-%d c:%d off:%d\n", line, len(m.normalized)-1, m.contentSize, m.cursor, m.offset)
 			continue
 		}
 
 		s += fmt.Sprintf("%d  -  ", i)
-		s += m.normalized[i] + "\n"
+		s += line + "\n"
 	}
 
-	s += "\nPress 'q' to quit"
+	if s[len(s)-1:] == "\n" {
+		s = s[:len(s)-1]
+	}
+
+	s += "\n\nPress 'q' to quit"
 	return s
 }
 
