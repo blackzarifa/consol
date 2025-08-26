@@ -36,11 +36,15 @@ func initialModel(
 	normalizedArr []string, lineEnding string,
 	conflicts []parser.Conflict,
 ) model {
+	initialCursor := 0
+	if len(conflicts) > 0 {
+		initialCursor = conflicts[0].StartLine - 1
+	}
 	return model{
 		conflicts:  conflicts,
 		normalized: normalizedArr,
 		lineEnding: lineEnding,
-		cursor:     0,
+		cursor:     initialCursor,
 		offset:     0,
 	}
 }
