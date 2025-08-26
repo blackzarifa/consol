@@ -15,6 +15,7 @@ type model struct {
 	cursor      int
 	height      int
 	offset      int
+	lastKeyG    bool
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -49,6 +50,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.offset++
 				}
 			}
+		case "g", "home":
+			if msg.String() == "g" && !m.lastKeyG {
+				m.lastKeyG = true
+				break
+			}
+			m.lastKeyG = false
+			m.cursor = 0
+			m.offset = 0
 		case "G", "end":
 			length := len(m.normalized) - 1
 			m.cursor = length
