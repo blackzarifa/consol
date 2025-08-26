@@ -3,12 +3,18 @@ package tui
 import (
 	"fmt"
 
+	"github.com/blackzarifa/consol/parser"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-func (m model) Init() tea.Cmd {
-	tea.SetWindowTitle("Consol - Conflict reSolver")
-	return nil
+type model struct {
+	conflicts   []parser.Conflict
+	normalized  []string
+	lineEnding  string
+	contentSize int
+	cursor      int
+	height      int
+	offset      int
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {

@@ -10,16 +10,6 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type model struct {
-	conflicts   []parser.Conflict
-	normalized  []string
-	lineEnding  string
-	contentSize int
-	cursor      int
-	height      int
-	offset      int
-}
-
 func RunProgram(normalized, lineEnding string, conflicts []parser.Conflict) {
 	normalizedArr := strings.Split(normalized, "\n")
 	if len(normalizedArr) > 0 && normalizedArr[len(normalizedArr)-1] == "" {
@@ -35,6 +25,11 @@ func RunProgram(normalized, lineEnding string, conflicts []parser.Conflict) {
 		fmt.Printf("Alas, there's been an error: %v", err)
 		os.Exit(1)
 	}
+}
+
+func (m model) Init() tea.Cmd {
+	tea.SetWindowTitle("Consol - Conflict reSolver")
+	return nil
 }
 
 func initialModel(
