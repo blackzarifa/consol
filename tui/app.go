@@ -50,6 +50,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.contentSize = m.height - 5 // 5 is the size of the header + footnote
 
 	case tea.KeyMsg:
+		scrolloff := 10
+
 		switch msg.String() {
 		case "ctrl+c", "q":
 			return m, tea.Quit
@@ -63,7 +65,15 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "j", "down":
 			if m.cursor < len(m.normalized)-1 {
 				m.cursor++
-				if m.cursor > m.contentSize+m.offset {
+
+				if len(m.normalized) <= m.contentSize {
+					break
+				}
+
+				lastVisibleLine := m.offset + m.contentSize
+				linesVisibleBelow := lastVisibleLine - m.cursor
+
+				if linesVisibleBelow < scrolloff && lastVisibleLine < len(m.normalized)-1 {
 					m.offset++
 				}
 			}
@@ -82,7 +92,7 @@ func (m model) View() string {
 		} else if i < m.offset {
 			continue
 		} else if i == m.cursor {
-			s += fmt.Sprintf(">>> %s <<< %d-%d c:%d off:%d\n", line, len(m.normalized)-1, m.contentSize, m.cursor, m.offset)
+			s += fmt.Sprintf(">>> %s <<< Length:%d CS:%d c:%d off:%d\n", line, len(m.normalized), m.contentSize, m.cursor, m.offset)
 			continue
 		}
 
