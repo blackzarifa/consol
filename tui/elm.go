@@ -90,5 +90,8 @@ func (m model) View() string {
 	}
 
 	s += "\n\nPress 'q' to quit"
+	if m.lastKeyG {
+		s += "  |  'g' - Press again to go to the beginning"
+	}
 	return s
 }
