@@ -8,14 +8,15 @@ import (
 )
 
 type model struct {
-	conflicts   []parser.Conflict
-	normalized  []string
-	lineEnding  string
-	contentSize int
-	cursor      int
-	height      int
-	offset      int
-	lastKeyG    bool
+	conflicts       []parser.Conflict
+	normalized      []string
+	lineEnding      string
+	contentSize     int
+	currentConflict int
+	cursor          int
+	height          int
+	offset          int
+	lastKeyG        bool
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -62,7 +63,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			length := len(m.normalized) - 1
 			m.cursor = length
 			m.offset = length - m.contentSize
+		case "n":
+			if m.currentConflict >= len(m.conflicts)-1 {
+				break
+			}
+			m.currentConflict++
+			m.cursor = m.conflicts[m.currentConflict].StartLine
 		}
+
 	}
 
 	return m, nil

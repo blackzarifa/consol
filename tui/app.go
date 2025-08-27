@@ -37,14 +37,17 @@ func initialModel(
 	conflicts []parser.Conflict,
 ) model {
 	initialCursor := 0
+	var currentConflict int
 	if len(conflicts) > 0 {
 		initialCursor = conflicts[0].StartLine - 1
+		currentConflict = 0
 	}
 	return model{
-		conflicts:  conflicts,
-		normalized: normalizedArr,
-		lineEnding: lineEnding,
-		cursor:     initialCursor,
-		offset:     0,
+		conflicts:       conflicts,
+		normalized:      normalizedArr,
+		lineEnding:      lineEnding,
+		currentConflict: currentConflict,
+		cursor:          initialCursor,
+		offset:          0,
 	}
 }
