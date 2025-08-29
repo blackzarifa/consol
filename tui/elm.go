@@ -60,9 +60,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.cursor = 0
 			m.offset = 0
 		case "G", "end":
-			length := len(m.normalized) - 1
-			m.cursor = length
-			m.offset = length - m.contentSize
+			m.cursor = len(m.normalized) - 1
+			m.offset = m.calculateOffset(m.cursor)
 		case "n":
 			if m.currentConflict >= len(m.conflicts)-1 {
 				break
