@@ -105,7 +105,7 @@ func (m model) View() string {
 		s = s[:len(s)-1]
 	}
 
-	s += "\n\nPress 'q' to quit"
+	s += "\n\nPress 'q' to quit  |  'np' to navigate conflicts"
 	if m.lastKeyG {
 		s += "  |  'g' - Press again to go to the beginning"
 	}
