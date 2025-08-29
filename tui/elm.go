@@ -2,6 +2,7 @@ package tui
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/blackzarifa/consol/parser"
 	tea "github.com/charmbracelet/bubbletea"
@@ -76,6 +77,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.currentConflict--
 			m.cursor = m.conflicts[m.currentConflict].StartLine
 			m.offset = m.calculateOffset(m.cursor)
+		case "o":
+			if len(m.conflicts) == 0 {
+				break
+			}
+			cc := m.conflicts[m.currentConflict]
+			m.normalized = slices.Replace(
+				m.normalized, cc.StartLine-1, cc.EndLine, cc.Ours,
+			)
 		}
 
 	}
@@ -92,11 +101,12 @@ func (m model) View() string {
 		} else if i < m.offset {
 			continue
 		} else if i == m.cursor {
-			s += fmt.Sprintf(">>> %s <<< Length:%d CS:%d c:%d off:%d\n", line, len(m.normalized), m.contentSize, m.cursor, m.offset)
+			s += fmt.Sprintf(
+				">>> %s <<< Current:%d lenCon:%d\n",
+				line, m.currentConflict, len(m.conflicts),
+			)
 			continue
 		}
-
-		s += fmt.Sprintf("%d  -  ", i)
 		s += line + "\n"
 	}
 
