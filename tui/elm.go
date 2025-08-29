@@ -69,6 +69,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.currentConflict++
 			m.cursor = m.conflicts[m.currentConflict].StartLine
+			m.offset = m.calculateOffset(m.cursor)
+		case "p":
+			if m.currentConflict <= 0 {
+				break
+			}
+			m.currentConflict--
+			m.cursor = m.conflicts[m.currentConflict].StartLine
+			m.offset = m.calculateOffset(m.cursor)
 		}
 
 	}
@@ -102,4 +110,10 @@ func (m model) View() string {
 		s += "  |  'g' - Press again to go to the beginning"
 	}
 	return s
+}
+
+func (m model) calculateOffset(cursor int) int {
+	centered := cursor - m.contentSize/2
+	maxOffset := len(m.normalized) - m.contentSize - 1
+	return max(0, min(centered, maxOffset))
 }

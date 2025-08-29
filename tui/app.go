@@ -48,6 +48,5 @@ func initialModel(
 		lineEnding:      lineEnding,
 		currentConflict: currentConflict,
 		cursor:          initialCursor,
-		offset:          0,
 	}
 }
