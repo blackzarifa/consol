@@ -5,6 +5,7 @@ import (
 	"slices"
 
 	"github.com/blackzarifa/consol/parser"
+	"github.com/blackzarifa/consol/utils"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -85,6 +86,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.normalized = slices.Replace(
 				m.normalized, cc.StartLine-1, cc.EndLine, cc.Ours,
 			)
+			m.conflicts = utils.RemoveIndex(m.conflicts, m.currentConflict)
 		}
 
 	}
