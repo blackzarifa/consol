@@ -2,10 +2,8 @@ package tui
 
 import (
 	"fmt"
-	"slices"
 
 	"github.com/blackzarifa/consol/parser"
-	"github.com/blackzarifa/consol/utils"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -83,10 +81,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				break
 			}
 			cc := m.conflicts[m.currentConflict]
-			m.normalized = slices.Replace(
-				m.normalized, cc.StartLine-1, cc.EndLine, cc.Ours,
-			)
-			m.conflicts = utils.RemoveIndex(m.conflicts, m.currentConflict)
+			m.resolveConflict(cc.Ours)
 		}
 
 	}
@@ -121,10 +116,4 @@ func (m model) View() string {
 		s += "  |  'g' - Press again to go to the beginning"
 	}
 	return s
-}
-
-func (m model) calculateOffset(cursor int) int {
-	centered := cursor - m.contentSize/2
-	maxOffset := len(m.normalized) - m.contentSize - 1
-	return max(0, min(centered, maxOffset))
 }
