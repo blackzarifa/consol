@@ -92,7 +92,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.resolveConflict(cc.Theirs)
 		case "w":
-			toSave := strings.Join(m.normalized, m.lineEnding)
+			toSave := strings.Join(m.normalized, m.lineEnding) + m.lineEnding
 			os.WriteFile(os.Args[1], []byte(toSave), 0664)
 		}
 
