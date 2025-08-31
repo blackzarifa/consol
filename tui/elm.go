@@ -6,31 +6,36 @@ import (
 	"strings"
 
 	"github.com/blackzarifa/consol/parser"
+	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 type model struct {
 	conflicts       []parser.Conflict
 	normalized      []string
 	lineEnding      string
-	contentSize     int
 	currentConflict int
 	cursor          int
-	height          int
-	offset          int
+	viewport        viewport.Model
 	lastKeyG        bool
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var cmd tea.Cmd
+
 	switch msg := msg.(type) {
 
 	case tea.WindowSizeMsg:
-		m.height = msg.Height
-		m.contentSize = m.height - 5 // 5 is the size of the header + footnote
+		headerHeight := lipgloss.Height(m.headerView())
+		footerHeight := lipgloss.Height(m.footerView())
+		verticalMarginHeight := headerHeight + footerHeight
+
+		m.viewport.Width = msg.Width
+		m.viewport.Height = msg.Height - verticalMarginHeight
+		m.updateViewportContent()
 
 	case tea.KeyMsg:
-		scrolloff := 10
-
 		switch msg.String() {
 		case "ctrl+c", "q":
 			return m, tea.Quit
@@ -38,22 +43,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.cursor > 0 {
 				m.cursor--
 				m.cursorToConflict()
-
-				if m.offset > 0 && m.cursor < m.offset+scrolloff {
-					m.offset--
-				}
+				m.updateViewportContent()
 			}
 		case "j", "down":
 			if m.cursor < len(m.normalized)-1 {
 				m.cursor++
 				m.cursorToConflict()
-
-				lastVisibleLine := m.offset + m.contentSize
-				linesVisibleBelow := lastVisibleLine - m.cursor
-
-				if linesVisibleBelow < scrolloff && lastVisibleLine < len(m.normalized)-1 {
-					m.offset++
-				}
+				m.updateViewportContent()
 			}
 		case "g", "home":
 			if msg.String() == "g" && !m.lastKeyG {
@@ -62,10 +58,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.lastKeyG = false
 			m.cursor = 0
-			m.offset = 0
+			m.updateViewportContent()
 		case "G", "end":
 			m.cursor = len(m.normalized) - 1
-			m.offset = m.calculateOffset(m.cursor)
+			m.updateViewportContent()
 		case "n", "p":
 			if msg.String() == "n" {
 				if m.currentConflict >= len(m.conflicts)-1 {
@@ -79,7 +75,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.currentConflict--
 			}
 			m.cursor = m.conflicts[m.currentConflict].StartLine
-			m.offset = m.calculateOffset(m.cursor)
+			m.updateViewportContent()
 		case "o", "t":
 			if len(m.conflicts) == 0 {
 				break
@@ -98,34 +94,21 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	}
 
-	return m, nil
+	return m, cmd
 }
 
 func (m model) View() string {
-	s := "=== CONSOL CONFLICT RESOLVER ===\n\n"
+	return fmt.Sprintf("%s\n%s\n%s", m.headerView(), m.viewport.View(), m.footerView())
+}
 
-	for i, line := range m.normalized {
-		if i > m.contentSize+m.offset {
-			break
-		} else if i < m.offset {
-			continue
-		} else if i == m.cursor {
-			s += fmt.Sprintf(
-				">>> %s <<< Current:%d lenCon:%d\n",
-				line, m.currentConflict, len(m.conflicts),
-			)
-			continue
-		}
-		s += line + "\n"
-	}
+func (m model) headerView() string {
+	return "=== CONSOL CONFLICT RESOLVER ===\n"
+}
 
-	if s[len(s)-1:] == "\n" {
-		s = s[:len(s)-1]
-	}
-
-	s += "\n\nPress 'q' to quit  |  'np' to navigate conflicts"
+func (m model) footerView() string {
+	footer := "\n'q' to quit  |  'jknp' to navigate"
 	if m.lastKeyG {
-		s += "  |  'g' - Press again to go to the beginning"
+		footer += "  |  'g' - Press again to go to the beginning"
 	}
-	return s
+	return footer
 }

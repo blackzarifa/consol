@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/blackzarifa/consol/parser"
+	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -38,15 +39,23 @@ func initialModel(
 ) model {
 	initialCursor := 0
 	var currentConflict int
+
 	if len(conflicts) > 0 {
 		initialCursor = conflicts[0].StartLine - 1
 		currentConflict = 0
 	}
-	return model{
+
+	vp := viewport.New(50, 25)
+
+	m := model{
 		conflicts:       conflicts,
 		normalized:      normalizedArr,
 		lineEnding:      lineEnding,
 		currentConflict: currentConflict,
 		cursor:          initialCursor,
+		viewport:        vp,
 	}
+
+	m.updateViewportContent()
+	return m
 }
