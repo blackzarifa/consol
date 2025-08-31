@@ -84,6 +84,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			if msg.String() == "o" {
 				m.resolveConflict(cc.Ours)
+				break
 			}
 			m.resolveConflict(cc.Theirs)
 		}
