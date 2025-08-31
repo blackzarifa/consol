@@ -76,12 +76,16 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.currentConflict--
 			m.cursor = m.conflicts[m.currentConflict].StartLine
 			m.offset = m.calculateOffset(m.cursor)
-		case "o":
+		case "o", "t":
 			if len(m.conflicts) == 0 {
 				break
 			}
 			cc := m.conflicts[m.currentConflict]
-			m.resolveConflict(cc.Ours)
+
+			if msg.String() == "o" {
+				m.resolveConflict(cc.Ours)
+			}
+			m.resolveConflict(cc.Theirs)
 		}
 
 	}
