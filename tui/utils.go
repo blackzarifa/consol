@@ -59,8 +59,16 @@ func (m *model) adjustCurrentConflict() {
 	m.offset = m.calculateOffset(m.cursor)
 }
 
-func (m model) calculateOffset(cursor int) int {
+func (m *model) calculateOffset(cursor int) int {
 	centered := cursor - m.contentSize/2
 	maxOffset := len(m.normalized) - m.contentSize - 1
 	return max(0, min(centered, maxOffset))
+}
+
+func (m *model) cursorToConflict() {
+	for i, c := range m.conflicts {
+		if m.cursor >= c.StartLine-1 && m.cursor <= c.EndLine-1 {
+			m.currentConflict = i
+		}
+	}
 }

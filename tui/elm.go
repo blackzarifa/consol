@@ -35,6 +35,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "k", "up":
 			if m.cursor > 0 {
 				m.cursor--
+				m.cursorToConflict()
 
 				if m.offset > 0 && m.cursor < m.offset+scrolloff {
 					m.offset--
@@ -43,6 +44,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "j", "down":
 			if m.cursor < len(m.normalized)-1 {
 				m.cursor++
+				m.cursorToConflict()
 
 				lastVisibleLine := m.offset + m.contentSize
 				linesVisibleBelow := lastVisibleLine - m.cursor
