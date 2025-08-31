@@ -62,18 +62,18 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "G", "end":
 			m.cursor = len(m.normalized) - 1
 			m.offset = m.calculateOffset(m.cursor)
-		case "n":
-			if m.currentConflict >= len(m.conflicts)-1 {
-				break
+		case "n", "p":
+			if msg.String() == "n" {
+				if m.currentConflict >= len(m.conflicts)-1 {
+					break
+				}
+				m.currentConflict++
+			} else {
+				if m.currentConflict <= 0 {
+					break
+				}
+				m.currentConflict--
 			}
-			m.currentConflict++
-			m.cursor = m.conflicts[m.currentConflict].StartLine
-			m.offset = m.calculateOffset(m.cursor)
-		case "p":
-			if m.currentConflict <= 0 {
-				break
-			}
-			m.currentConflict--
 			m.cursor = m.conflicts[m.currentConflict].StartLine
 			m.offset = m.calculateOffset(m.cursor)
 		case "o", "t":
