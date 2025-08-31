@@ -2,6 +2,8 @@ package tui
 
 import (
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/blackzarifa/consol/parser"
 	tea "github.com/charmbracelet/bubbletea"
@@ -89,6 +91,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				break
 			}
 			m.resolveConflict(cc.Theirs)
+		case "w":
+			toSave := strings.Join(m.normalized, m.lineEnding)
+			os.WriteFile(os.Args[1], []byte(toSave), 0664)
 		}
 
 	}
