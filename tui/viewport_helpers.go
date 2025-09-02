@@ -50,7 +50,7 @@ func (m *model) updateViewportContent() {
 
 		if i == m.cursor {
 			cursorStyle := lipgloss.NewStyle().
-				Background(lipgloss.AdaptiveColor{Dark: "238", Light: "252"}).
+				Background(lipgloss.Color("52")).
 				Foreground(lipgloss.Color("15")).
 				Width(m.viewport.Width)
 			styledLine = cursorStyle.Render(line)
