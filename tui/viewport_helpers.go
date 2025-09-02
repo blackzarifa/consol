@@ -10,16 +10,20 @@ import (
 func (m *model) updateViewportContent() {
 	oursBranch := lipgloss.NewStyle().
 		Background(lipgloss.Color("28")).
-		Foreground(lipgloss.Color("15")).Bold(true)
+		Foreground(lipgloss.Color("15")).Bold(true).
+		Width(m.viewport.Width)
 	theirsBranch := lipgloss.NewStyle().
 		Background(lipgloss.Color("19")).
-		Foreground(lipgloss.Color("15")).Bold(true)
+		Foreground(lipgloss.Color("15")).Bold(true).
+		Width(m.viewport.Width)
 	oursStyle := lipgloss.NewStyle().
 		Background(lipgloss.Color("22")).
-		Foreground(lipgloss.Color("15"))
+		Foreground(lipgloss.Color("15")).
+		Width(m.viewport.Width)
 	theirsStyle := lipgloss.NewStyle().
 		Background(lipgloss.Color("18")).
-		Foreground(lipgloss.Color("15"))
+		Foreground(lipgloss.Color("15")).
+		Width(m.viewport.Width)
 
 	var lines []string
 	state := "normal" // normal, ours, theirs
@@ -47,7 +51,8 @@ func (m *model) updateViewportContent() {
 		if i == m.cursor {
 			cursorStyle := lipgloss.NewStyle().
 				Background(lipgloss.AdaptiveColor{Dark: "238", Light: "252"}).
-				Foreground(lipgloss.Color("15"))
+				Foreground(lipgloss.Color("15")).
+				Width(m.viewport.Width)
 			styledLine = cursorStyle.Render(line)
 		}
 
