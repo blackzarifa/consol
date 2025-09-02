@@ -14,25 +14,25 @@ type Conflict struct {
 }
 
 var (
-	conflictStart     = regexp.MustCompile(`(?m)^<{7}( .*)?`)
-	conflictSeparator = regexp.MustCompile(`(?m)^={7}`)
-	conflictEnd       = regexp.MustCompile(`(?m)^>{7}( .*)?`)
+	ConflictStart     = regexp.MustCompile(`(?m)^<{7}( .*)?`)
+	ConflictSeparator = regexp.MustCompile(`(?m)^={7}`)
+	ConflictEnd       = regexp.MustCompile(`(?m)^>{7}( .*)?`)
 )
 
 func HasConflict(content string) bool {
-	return conflictStart.MatchString(content)
+	return ConflictStart.MatchString(content)
 }
 
-// ParseFile parses an entire file string to return conflicts, normalized content, and
-// line ending
+// ParseFile parses an entire file string to return conflicts, normalized
+// content, and line ending
 func ParseFile(content string) ([]Conflict, string, string) {
 	var conflicts []Conflict
 
 	normalized, lineEnding := normalizeLineEndings(content)
 
-	startIndexes := conflictStart.FindAllStringIndex(normalized, -1)
-	separatorIndexes := conflictSeparator.FindAllStringIndex(normalized, -1)
-	endIndexes := conflictEnd.FindAllStringIndex(normalized, -1)
+	startIndexes := ConflictStart.FindAllStringIndex(normalized, -1)
+	separatorIndexes := ConflictSeparator.FindAllStringIndex(normalized, -1)
+	endIndexes := ConflictEnd.FindAllStringIndex(normalized, -1)
 
 	for i, start := range startIndexes {
 		if i >= len(separatorIndexes) || i >= len(endIndexes) {
