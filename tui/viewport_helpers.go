@@ -3,20 +3,58 @@ package tui
 import (
 	"fmt"
 	"strings"
+
+	"github.com/blackzarifa/consol/parser"
+	"github.com/charmbracelet/lipgloss"
 )
 
 func (m *model) updateViewportContent() {
+	oursBranch := lipgloss.NewStyle().
+		Background(lipgloss.Color("28")).
+		Foreground(lipgloss.Color("15")).Bold(true)
+	theirsBranch := lipgloss.NewStyle().
+		Background(lipgloss.Color("19")).
+		Foreground(lipgloss.Color("15")).Bold(true)
+	oursStyle := lipgloss.NewStyle().
+		Background(lipgloss.Color("22")).
+		Foreground(lipgloss.Color("15"))
+	theirsStyle := lipgloss.NewStyle().
+		Background(lipgloss.Color("18")).
+		Foreground(lipgloss.Color("15"))
+
 	var lines []string
+	state := "normal" // normal, ours, theirs
+
 	for i, line := range m.normalized {
-		if i != m.cursor {
-			lines = append(lines, line)
-			continue
+		styledLine := line
+
+		if parser.ConflictStart.MatchString(line) {
+			state = "ours"
+			styledLine = oursBranch.Render(line)
+		} else if parser.ConflictSeparator.MatchString(line) {
+			state = "theirs"
+		} else if parser.ConflictEnd.MatchString(line) {
+			state = "normal"
+			styledLine = theirsBranch.Render(line)
+		} else {
+			switch state {
+			case "ours":
+				styledLine = oursStyle.Render(line)
+			case "theirs":
+				styledLine = theirsStyle.Render(line)
+			}
 		}
 
-		lines = append(lines, fmt.Sprintf(
-			">>> %s <<< Current:%d lenCon:%d",
-			line, m.currentConflict, len(m.conflicts),
-		))
+		if i == m.cursor {
+			styledLine = fmt.Sprintf(
+				">>> %s <<< Current:%d lenCon:%d",
+				styledLine,
+				m.currentConflict,
+				len(m.conflicts),
+			)
+		}
+
+		lines = append(lines, styledLine)
 	}
 
 	content := strings.Join(lines, "\n")
