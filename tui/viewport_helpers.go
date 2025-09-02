@@ -1,7 +1,6 @@
 package tui
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/blackzarifa/consol/parser"
@@ -46,12 +45,10 @@ func (m *model) updateViewportContent() {
 		}
 
 		if i == m.cursor {
-			styledLine = fmt.Sprintf(
-				">>> %s <<< Current:%d lenCon:%d",
-				styledLine,
-				m.currentConflict,
-				len(m.conflicts),
-			)
+			cursorStyle := lipgloss.NewStyle().
+				Background(lipgloss.AdaptiveColor{Dark: "238", Light: "252"}).
+				Foreground(lipgloss.Color("15"))
+			styledLine = cursorStyle.Render(line)
 		}
 
 		lines = append(lines, styledLine)
