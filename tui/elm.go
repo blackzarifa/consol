@@ -14,7 +14,7 @@ import (
 type model struct {
 	conflicts       []parser.Conflict
 	normalized      []string
-	resolvedLines   map[int]bool
+	resolvedLines   map[string]bool
 	viewport        viewport.Model
 	lineEnding      string
 	currentConflict int

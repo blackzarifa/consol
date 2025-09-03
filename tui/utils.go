@@ -20,18 +20,19 @@ func (m *model) resolveConflict(resolution string) {
 	cc := m.conflicts[m.currentConflict]
 	resLines := strings.Split(resolution, "\n")
 
-	if m.resolvedLines == nil {
-		m.resolvedLines = make(map[int]bool)
-	}
-
-	for i := range resLines {
-		lineNum := cc.StartLine + i
-		m.resolvedLines[lineNum] = true
-	}
-
 	m.normalized = slices.Replace(
 		m.normalized, cc.StartLine-1, cc.EndLine, resLines...,
 	)
+
+	if m.resolvedLines == nil {
+		m.resolvedLines = make(map[string]bool)
+	}
+
+	for _, resLine := range resLines {
+		if strings.TrimSpace(resLine) != "" {
+			m.resolvedLines[strings.TrimSpace(resLine)] = true
+		}
+	}
 	m.conflicts = RemoveIndex(m.conflicts, m.currentConflict)
 
 	originalNumLines := cc.EndLine - cc.StartLine + 1
@@ -41,10 +42,7 @@ func (m *model) resolveConflict(resolution string) {
 	m.adjustCurrentConflict()
 }
 
-func (m *model) updateConflictLines(
-	resolved parser.Conflict,
-	lineDiff int,
-) {
+func (m *model) updateConflictLines(resolved parser.Conflict, lineDiff int) {
 	for i := range m.conflicts {
 		if m.conflicts[i].StartLine <= resolved.StartLine {
 			continue
