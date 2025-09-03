@@ -20,6 +20,14 @@ func (m *model) updateViewportContent() {
 		if parser.ConflictStart.MatchString(line) {
 			lineType = "conflictStart"
 			state = "ours"
+
+			messageStyle := lipgloss.NewStyle().
+				Foreground(lipgloss.AdaptiveColor{Dark: "246", Light: "240"}).
+				Width(m.viewport.Width)
+
+			acceptMessage := messageStyle.Render("Accept incoming change (o) | Ignore (t)")
+			messagePrefix := strings.Repeat(" ", lineNumWidth+spacing)
+			lines = append(lines, messagePrefix+acceptMessage)
 		} else if parser.ConflictSeparator.MatchString(line) {
 			lineType = "conflictSeparator"
 			state = "theirs"
