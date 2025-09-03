@@ -14,10 +14,11 @@ import (
 type model struct {
 	conflicts       []parser.Conflict
 	normalized      []string
+	resolvedLines   map[int]bool
+	viewport        viewport.Model
 	lineEnding      string
 	currentConflict int
 	cursor          int
-	viewport        viewport.Model
 	lastKeyG        bool
 }
 

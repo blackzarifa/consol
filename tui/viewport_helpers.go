@@ -40,11 +40,26 @@ func (m *model) updateViewportContent() {
 		var styledLine string
 		var displayLine string
 
+		var isResolved bool
 		if (state == "normal" || state == "ours") && lineType == "" {
 			lineNumStr = fmt.Sprintf("%*d", lineNumWidth, lineNumber)
+			if m.resolvedLines != nil && m.resolvedLines[lineNumber] {
+				lineNumStyle := lipgloss.NewStyle().
+					Foreground(lipgloss.Color("136")).
+					BorderRight(true).
+					BorderStyle(lipgloss.NormalBorder()).
+					BorderForeground(lipgloss.Color("136"))
+				lineNumStr = lineNumStyle.Render(lineNumStr)
+				isResolved = true
+			}
 			lineNumber++
 		} else {
 			lineNumStr = strings.Repeat(" ", lineNumWidth)
+		}
+
+		newSpacing := spacing
+		if isResolved {
+			newSpacing = spacing - 1 // 1 for border width
 		}
 
 		if i == m.cursor {
@@ -59,10 +74,10 @@ func (m *model) updateViewportContent() {
 
 			firstChar := cursorStyle.Render(string(line[0]))
 			restStyled := m.styleLineSegment(line[1:], lineType, state)
-			displayLine = lineNumStr + strings.Repeat(" ", spacing) + firstChar + restStyled
+			displayLine = lineNumStr + strings.Repeat(" ", newSpacing) + firstChar + restStyled
 		} else {
 			styledLine = m.styleLineSegment(line, lineType, state)
-			displayLine = lineNumStr + strings.Repeat(" ", spacing) + styledLine
+			displayLine = lineNumStr + strings.Repeat(" ", newSpacing) + styledLine
 		}
 
 		lines = append(lines, displayLine)

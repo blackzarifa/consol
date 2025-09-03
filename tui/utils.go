@@ -20,6 +20,15 @@ func (m *model) resolveConflict(resolution string) {
 	cc := m.conflicts[m.currentConflict]
 	resLines := strings.Split(resolution, "\n")
 
+	if m.resolvedLines == nil {
+		m.resolvedLines = make(map[int]bool)
+	}
+
+	for i := range resLines {
+		lineNum := cc.StartLine + i
+		m.resolvedLines[lineNum] = true
+	}
+
 	m.normalized = slices.Replace(
 		m.normalized, cc.StartLine-1, cc.EndLine, resLines...,
 	)
