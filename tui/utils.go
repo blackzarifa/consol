@@ -20,10 +20,7 @@ func (m *model) resolveConflict(resolution string) {
 	cc := m.conflicts[m.currentConflict]
 	resLines := strings.Split(resolution, "\n")
 
-	m.normalized = slices.Replace(
-		m.normalized, cc.StartLine-1, cc.EndLine, resLines...,
-	)
-
+	m.normalized = slices.Replace(m.normalized, cc.StartLine-1, cc.EndLine, resLines...)
 	if m.resolvedLines == nil {
 		m.resolvedLines = make(map[string]bool)
 	}
