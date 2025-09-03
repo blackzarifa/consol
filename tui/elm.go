@@ -74,7 +74,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 				m.currentConflict--
 			}
-			m.cursor = m.conflicts[m.currentConflict].StartLine
+			m.cursor = m.conflicts[m.currentConflict].StartLine - 1
 			m.updateViewportContent()
 		case "o", "t":
 			if len(m.conflicts) == 0 {
@@ -89,7 +89,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.resolveConflict(cc.Theirs)
 		case "w":
 			toSave := strings.Join(m.normalized, m.lineEnding) + m.lineEnding
-			os.WriteFile(os.Args[1], []byte(toSave), 0664)
+			os.WriteFile(os.Args[1], []byte(toSave), 0o664)
 		}
 
 	}
