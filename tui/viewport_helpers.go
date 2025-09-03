@@ -1,6 +1,7 @@
 package tui
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/blackzarifa/consol/parser"
@@ -10,6 +11,9 @@ import (
 func (m *model) updateViewportContent() {
 	var lines []string
 	state := "normal" // normal, ours, theirs
+	spacing := 2
+	lineNumber := 1
+	lineNumWidth := 5
 
 	for i, line := range m.normalized {
 		var lineType string
@@ -24,7 +28,16 @@ func (m *model) updateViewportContent() {
 			state = "normal"
 		}
 
+		var lineNumStr string
 		var styledLine string
+		var displayLine string
+
+		if (state == "normal" || state == "ours") && lineType == "" {
+			lineNumStr = fmt.Sprintf("%*d", lineNumWidth, lineNumber)
+			lineNumber++
+		} else {
+			lineNumStr = strings.Repeat(" ", lineNumWidth)
+		}
 
 		if i == m.cursor {
 			cursorStyle := lipgloss.NewStyle().
@@ -38,12 +51,13 @@ func (m *model) updateViewportContent() {
 
 			firstChar := cursorStyle.Render(string(line[0]))
 			restStyled := m.styleLineSegment(line[1:], lineType, state)
-			lines = append(lines, firstChar+restStyled)
-			continue
+			displayLine = lineNumStr + strings.Repeat(" ", spacing) + firstChar + restStyled
+		} else {
+			styledLine = m.styleLineSegment(line, lineType, state)
+			displayLine = lineNumStr + strings.Repeat(" ", spacing) + styledLine
 		}
 
-		styledLine = m.styleLineSegment(line, lineType, state)
-		lines = append(lines, styledLine)
+		lines = append(lines, displayLine)
 	}
 
 	content := strings.Join(lines, "\n")
