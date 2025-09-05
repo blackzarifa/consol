@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/blackzarifa/consol/parser"
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -15,30 +14,23 @@ const (
 
 func (m *model) updateViewportContent() {
 	var lines []string
-	state := "normal" // normal, ours, theirs
 	lineNumber := 1
+	state := "normal"
 
 	for i, line := range m.normalized {
-		var lineType string
-		if parser.ConflictStart.MatchString(line) {
-			lineType = "conflictStart"
-			state = "ours"
-			lines = append(lines, renderConflictMessage(m.viewport.Width))
-		} else if parser.ConflictSeparator.MatchString(line) {
-			lineType = "conflictSeparator"
-			state = "theirs"
-		} else if parser.ConflictEnd.MatchString(line) {
-			lineType = "conflictEnd"
-			state = "normal"
-		}
+		lineType, newState, showLineNumber := processConflictLine(line, state)
+		state = newState
 
-		showLineNumber := (state == "normal" || state == "ours") && lineType == ""
-		lineNumStr, isResolved := m.renderLineNumber(lineNumber, showLineNumber)
+		if lineType == "conflictStart" {
+			lines = append(lines, renderConflictMessage(m.viewport.Width))
+		}
+		isResolved := i < len(m.resolvedLines) && m.resolvedLines[i]
+		lineNumStr := m.renderLineNumber(lineNumber, showLineNumber, isResolved)
 		if showLineNumber {
 			lineNumber++
 		}
 
-		displayLine := m.renderLine(line, lineNumStr, lineType, state, isResolved, i == m.cursor)
+		displayLine := m.renderLine(line, lineNumStr, lineType, newState, isResolved, i == m.cursor)
 		lines = append(lines, displayLine)
 	}
 
@@ -57,15 +49,15 @@ func renderConflictMessage(screenWidth int) string {
 	return messagePrefix + acceptMessage
 }
 
-func (m *model) renderLineNumber(lineNumber int, showLineNumber bool) (string, bool) {
+func (m *model) renderLineNumber(lineNumber int, showLineNumber bool, isResolved bool) string {
 	if !showLineNumber {
-		return strings.Repeat(" ", lineNumWidth), false
+		return strings.Repeat(" ", lineNumWidth)
 	}
 
 	lineNumStr := fmt.Sprintf("%*d", lineNumWidth, lineNumber)
 
-	if !m.isLineResolved(lineNumber) {
-		return lineNumStr, false
+	if !isResolved {
+		return lineNumStr
 	}
 
 	lineNumStyle := lipgloss.NewStyle().
@@ -73,7 +65,7 @@ func (m *model) renderLineNumber(lineNumber int, showLineNumber bool) (string, b
 		BorderRight(true).
 		BorderStyle(lipgloss.NormalBorder()).
 		BorderForeground(lipgloss.Color("136"))
-	return lineNumStyle.Render(lineNumStr), true
+	return lineNumStyle.Render(lineNumStr)
 }
 
 func (m *model) renderLine(

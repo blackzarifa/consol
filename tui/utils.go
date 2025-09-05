@@ -12,6 +12,17 @@ func RemoveIndex[T any](slice []T, index int) []T {
 	return slice
 }
 
+func processConflictLine(line, state string) (lineType, newState string, showLineNumber bool) {
+	if parser.ConflictStart.MatchString(line) {
+		return "conflictStart", "ours", false
+	} else if parser.ConflictSeparator.MatchString(line) {
+		return "conflictSeparator", "theirs", false
+	} else if parser.ConflictEnd.MatchString(line) {
+		return "conflictEnd", "normal", false
+	}
+	return "", state, (state == "normal" || state == "ours")
+}
+
 func (m *model) resolveConflict(resolution string) {
 	if len(m.conflicts) == 0 {
 		return
@@ -74,49 +85,11 @@ func (m *model) adjustCurrentConflict() {
 	m.updateViewportContent()
 }
 
+// cursorToConflict changes currentConflict to the one the cursor passed by
 func (m *model) cursorToConflict() {
 	for i, c := range m.conflicts {
 		if m.cursor >= c.StartLine-1 && m.cursor <= c.EndLine-1 {
 			m.currentConflict = i
 		}
 	}
-}
-
-func (m *model) isLineResolved(visualLineNum int) bool {
-	normalizedIndex := m.visualLineToNormalizedIndex(visualLineNum)
-	if normalizedIndex < 0 || normalizedIndex >= len(m.resolvedLines) {
-		return false
-	}
-	return m.resolvedLines[normalizedIndex]
-}
-
-// visualLineToNormalizedIndex converts a visual line number to normalized slice index
-func (m *model) visualLineToNormalizedIndex(visualLineNum int) int {
-	currentVisualLine := 1
-	state := "normal" // normal, ours, theirs
-
-	for i, line := range m.normalized {
-		var lineType string
-		if parser.ConflictStart.MatchString(line) {
-			lineType = "conflictStart"
-			state = "ours"
-		} else if parser.ConflictSeparator.MatchString(line) {
-			lineType = "conflictSeparator"
-			state = "theirs"
-		} else if parser.ConflictEnd.MatchString(line) {
-			lineType = "conflictEnd"
-			state = "normal"
-		}
-
-		showLineNumber := (state == "normal" || state == "ours") && lineType == ""
-
-		if showLineNumber {
-			if currentVisualLine == visualLineNum {
-				return i
-			}
-			currentVisualLine++
-		}
-	}
-
-	return -1
 }
