@@ -48,6 +48,7 @@ func initialModel(
 	vp := viewport.New(50, 25)
 
 	m := model{
+		resolvedLines:   make([]bool, len(normalizedArr)),
 		conflicts:       conflicts,
 		normalized:      normalizedArr,
 		lineEnding:      lineEnding,

@@ -12,9 +12,9 @@ import (
 )
 
 type model struct {
+	resolvedLines   []bool
 	conflicts       []parser.Conflict
 	normalized      []string
-	resolvedLines   map[string]bool
 	viewport        viewport.Model
 	lineEnding      string
 	currentConflict int

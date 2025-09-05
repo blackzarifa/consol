@@ -23,7 +23,7 @@ func (m *model) updateViewportContent() {
 		if parser.ConflictStart.MatchString(line) {
 			lineType = "conflictStart"
 			state = "ours"
-			lines = append(lines, m.renderConflictMessage())
+			lines = append(lines, renderConflictMessage(m.viewport.Width))
 		} else if parser.ConflictSeparator.MatchString(line) {
 			lineType = "conflictSeparator"
 			state = "theirs"
@@ -33,12 +33,12 @@ func (m *model) updateViewportContent() {
 		}
 
 		showLineNumber := (state == "normal" || state == "ours") && lineType == ""
-		lineNumStr, isResolved := m.renderLineNumber(lineNumber, line, showLineNumber)
+		lineNumStr, isResolved := m.renderLineNumber(lineNumber, showLineNumber)
 		if showLineNumber {
 			lineNumber++
 		}
 
-		displayLine := m.renderLine(line, lineNumStr, isResolved, i == m.cursor, lineType, state)
+		displayLine := m.renderLine(line, lineNumStr, lineType, state, isResolved, i == m.cursor)
 		lines = append(lines, displayLine)
 	}
 
@@ -47,60 +47,61 @@ func (m *model) updateViewportContent() {
 	m.viewport.SetYOffset(max(0, m.cursor-m.viewport.Height/2))
 }
 
-func (m *model) renderConflictMessage() string {
+func renderConflictMessage(screenWidth int) string {
 	messageStyle := lipgloss.NewStyle().
 		Foreground(lipgloss.AdaptiveColor{Dark: "246", Light: "240"}).
-		Width(m.viewport.Width)
+		Width(screenWidth)
 
 	acceptMessage := messageStyle.Render("Accept incoming change (o) | Ignore (t)")
 	messagePrefix := strings.Repeat(" ", lineNumWidth+spacing)
 	return messagePrefix + acceptMessage
 }
 
-func (m *model) renderLineNumber(lineNumber int, line string, showLineNumber bool) (string, bool) {
-	if showLineNumber {
-		lineNumStr := fmt.Sprintf("%*d", lineNumWidth, lineNumber)
+func (m *model) renderLineNumber(lineNumber int, showLineNumber bool) (string, bool) {
+	if !showLineNumber {
+		return strings.Repeat(" ", lineNumWidth), false
+	}
 
-		if m.resolvedLines != nil && m.resolvedLines[strings.TrimSpace(line)] {
-			lineNumStyle := lipgloss.NewStyle().
-				Foreground(lipgloss.Color("136")).
-				BorderRight(true).
-				BorderStyle(lipgloss.NormalBorder()).
-				BorderForeground(lipgloss.Color("136"))
-			return lineNumStyle.Render(lineNumStr), true
-		}
+	lineNumStr := fmt.Sprintf("%*d", lineNumWidth, lineNumber)
+
+	if !m.isLineResolved(lineNumber) {
 		return lineNumStr, false
 	}
-	return strings.Repeat(" ", lineNumWidth), false
+
+	lineNumStyle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color("136")).
+		BorderRight(true).
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(lipgloss.Color("136"))
+	return lineNumStyle.Render(lineNumStr), true
 }
 
 func (m *model) renderLine(
-	line, lineNumStr string,
+	line, lineNumStr, lineType, state string,
 	isResolved, isCursor bool,
-	lineType, state string,
 ) string {
 	lineSpacing := strings.Repeat(" ", spacing)
 	if isResolved {
 		lineSpacing = lineSpacing[0 : len(lineSpacing)-1]
 	}
 
-	if isCursor {
-		cursorStyle := lipgloss.NewStyle().
-			Background(lipgloss.AdaptiveColor{Dark: "255", Light: "0"}).
-			Foreground(lipgloss.AdaptiveColor{Dark: "0", Light: "255"}).
-			Blink(true)
-
-		if len(line) == 0 {
-			line = " "
-		}
-
-		firstChar := cursorStyle.Render(string(line[0]))
-		restStyled := m.styleLineSegment(line[1:], lineType, state)
-		return lineNumStr + lineSpacing + firstChar + restStyled
+	if !isCursor {
+		styledLine := m.styleLineSegment(line, lineType, state)
+		return lineNumStr + lineSpacing + styledLine
 	}
 
-	styledLine := m.styleLineSegment(line, lineType, state)
-	return lineNumStr + lineSpacing + styledLine
+	cursorStyle := lipgloss.NewStyle().
+		Background(lipgloss.AdaptiveColor{Dark: "255", Light: "0"}).
+		Foreground(lipgloss.AdaptiveColor{Dark: "0", Light: "255"}).
+		Blink(true)
+
+	if len(line) == 0 {
+		line = " "
+	}
+
+	firstChar := cursorStyle.Render(string(line[0]))
+	restStyled := m.styleLineSegment(line[1:], lineType, state)
+	return lineNumStr + lineSpacing + firstChar + restStyled
 }
 
 func (m *model) styleLineSegment(line, lineType, state string) string {

@@ -20,16 +20,23 @@ func (m *model) resolveConflict(resolution string) {
 	cc := m.conflicts[m.currentConflict]
 	resLines := strings.Split(resolution, "\n")
 
-	m.normalized = slices.Replace(m.normalized, cc.StartLine-1, cc.EndLine, resLines...)
-	if m.resolvedLines == nil {
-		m.resolvedLines = make(map[string]bool)
+	for len(m.resolvedLines) < len(m.normalized) {
+		m.resolvedLines = append(m.resolvedLines, false)
 	}
 
-	for _, resLine := range resLines {
-		if strings.TrimSpace(resLine) != "" {
-			m.resolvedLines[strings.TrimSpace(resLine)] = true
-		}
+	newResolvedLines := make([]bool, len(resLines))
+	for i := range newResolvedLines {
+		newResolvedLines[i] = true
 	}
+
+	m.normalized = slices.Replace(m.normalized, cc.StartLine-1, cc.EndLine, resLines...)
+	m.resolvedLines = slices.Replace(
+		m.resolvedLines,
+		cc.StartLine-1,
+		cc.EndLine,
+		newResolvedLines...,
+	)
+
 	m.conflicts = RemoveIndex(m.conflicts, m.currentConflict)
 
 	originalNumLines := cc.EndLine - cc.StartLine + 1
@@ -39,6 +46,8 @@ func (m *model) resolveConflict(resolution string) {
 	m.adjustCurrentConflict()
 }
 
+// updateConflictLines updates the start and end lines in each other conflict after resolved,
+// according to the given line diff
 func (m *model) updateConflictLines(resolved parser.Conflict, lineDiff int) {
 	for i := range m.conflicts {
 		if m.conflicts[i].StartLine <= resolved.StartLine {
@@ -49,6 +58,8 @@ func (m *model) updateConflictLines(resolved parser.Conflict, lineDiff int) {
 	}
 }
 
+// adjustCurrentConflict fixes the value of the m.currentConflict if it's higher than the amount of
+// conflicts
 func (m *model) adjustCurrentConflict() {
 	if len(m.conflicts) == 0 {
 		m.currentConflict = 0
@@ -69,4 +80,43 @@ func (m *model) cursorToConflict() {
 			m.currentConflict = i
 		}
 	}
+}
+
+func (m *model) isLineResolved(visualLineNum int) bool {
+	normalizedIndex := m.visualLineToNormalizedIndex(visualLineNum)
+	if normalizedIndex < 0 || normalizedIndex >= len(m.resolvedLines) {
+		return false
+	}
+	return m.resolvedLines[normalizedIndex]
+}
+
+// visualLineToNormalizedIndex converts a visual line number to normalized slice index
+func (m *model) visualLineToNormalizedIndex(visualLineNum int) int {
+	currentVisualLine := 1
+	state := "normal" // normal, ours, theirs
+
+	for i, line := range m.normalized {
+		var lineType string
+		if parser.ConflictStart.MatchString(line) {
+			lineType = "conflictStart"
+			state = "ours"
+		} else if parser.ConflictSeparator.MatchString(line) {
+			lineType = "conflictSeparator"
+			state = "theirs"
+		} else if parser.ConflictEnd.MatchString(line) {
+			lineType = "conflictEnd"
+			state = "normal"
+		}
+
+		showLineNumber := (state == "normal" || state == "ours") && lineType == ""
+
+		if showLineNumber {
+			if currentVisualLine == visualLineNum {
+				return i
+			}
+			currentVisualLine++
+		}
+	}
+
+	return -1
 }
