@@ -85,9 +85,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			if msg.String() == "o" {
 				m.resolveConflict(cc.Ours)
+				m.updateViewportContent()
 				break
 			}
 			m.resolveConflict(cc.Theirs)
+			m.updateViewportContent()
 		case "w":
 			toSave := strings.Join(m.normalized, m.lineEnding) + m.lineEnding
 			os.WriteFile(os.Args[1], []byte(toSave), 0o664)
