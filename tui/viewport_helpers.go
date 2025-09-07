@@ -21,9 +21,11 @@ func (m *model) updateViewportContent() {
 		lineType, newState, showLineNumber := processConflictLine(line, state)
 		state = newState
 
-		if lineType == "conflictStart" {
+		realLineNumber := i + 1
+		if lineType == "conflictStart" && realLineNumber == m.conflicts[m.currentConflict].StartLine {
 			lines = append(lines, renderConflictMessage(m.viewport.Width))
 		}
+
 		isResolved := i < len(m.resolvedLines) && m.resolvedLines[i]
 		lineNumStr := m.renderLineNumber(lineNumber, showLineNumber, isResolved)
 		if showLineNumber {
