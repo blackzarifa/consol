@@ -109,7 +109,7 @@ func (m model) headerView() string {
 }
 
 func (m model) footerView() string {
-	footer := "\n'q' to quit  |  'jknp' to navigate"
+	footer := "\n'w' to save | 'q' to quit  |  'jknp' to navigate"
 	if m.lastKeyG {
 		footer += "  |  'g' - Press again to go to the beginning"
 	}
