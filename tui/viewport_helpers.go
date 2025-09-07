@@ -22,8 +22,9 @@ func (m *model) updateViewportContent() {
 		state = newState
 
 		realLineNumber := i + 1
-		if lineType == "conflictStart" && realLineNumber == m.conflicts[m.currentConflict].StartLine {
-			lines = append(lines, renderConflictMessage(m.viewport.Width))
+		isCurrentConflictLine := realLineNumber == m.conflicts[m.currentConflict].StartLine
+		if lineType == "conflictStart" && isCurrentConflictLine {
+			lines = append(lines, m.renderConflictMessage(m.viewport.Width))
 		}
 
 		isResolved := i < len(m.resolvedLines) && m.resolvedLines[i]
@@ -41,14 +42,16 @@ func (m *model) updateViewportContent() {
 	m.viewport.SetYOffset(max(0, m.cursor-m.viewport.Height/2))
 }
 
-func renderConflictMessage(screenWidth int) string {
+func (m *model) renderConflictMessage(screenWidth int) string {
 	messageStyle := lipgloss.NewStyle().
 		Foreground(lipgloss.AdaptiveColor{Dark: "246", Light: "240"}).
 		Width(screenWidth)
 
-	acceptMessage := messageStyle.Render("Accept incoming change (o) | Ignore (t)")
 	messagePrefix := strings.Repeat(" ", lineNumWidth+spacing)
-	return messagePrefix + acceptMessage
+	acceptMessage := "Accept change (o) | Ignore (t)"
+	conflictNum := fmt.Sprintf(" | Conflict %d/%d", m.currentConflict+1, len(m.conflicts))
+
+	return messageStyle.Render(messagePrefix + acceptMessage + conflictNum)
 }
 
 func (m *model) renderLineNumber(lineNumber int, showLineNumber bool, isResolved bool) string {
