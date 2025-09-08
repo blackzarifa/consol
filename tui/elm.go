@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/blackzarifa/consol/parser"
 	"github.com/charmbracelet/bubbles/viewport"
@@ -17,6 +18,7 @@ type model struct {
 	normalized      []string
 	viewport        viewport.Model
 	lineEnding      string
+	statusMessage   string
 	currentConflict int
 	cursor          int
 	lastKeyG        bool
@@ -37,6 +39,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.updateViewportContent()
 
 	case tea.KeyMsg:
+		m.statusMessage = ""
 		switch msg.String() {
 		case "ctrl+c", "q":
 			return m, tea.Quit
@@ -93,6 +96,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "w":
 			toSave := strings.Join(m.normalized, m.lineEnding) + m.lineEnding
 			os.WriteFile(os.Args[1], []byte(toSave), 0o664)
+			m.statusMessage = "File Saved"
+			cmd = tea.Tick(2*time.Second, func(t time.Time) tea.Msg {
+				return tea.KeyMsg{}
+			})
 		}
 
 	}
@@ -109,6 +116,10 @@ func (m model) headerView() string {
 }
 
 func (m model) footerView() string {
+	if m.statusMessage != "" {
+		return "\n" + m.statusMessage
+	}
+
 	footer := "\n'w' to save | 'q' to quit  |  'jknp' to navigate"
 	if m.lastKeyG {
 		footer += "  |  'g' - Press again to go to the beginning"
