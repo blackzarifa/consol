@@ -112,7 +112,14 @@ func (m model) View() string {
 }
 
 func (m model) headerView() string {
-	return "=== CONSOL CONFLICT RESOLVER ===\n"
+	titleStyle := lipgloss.NewStyle().
+		Bold(true).
+		Border(lipgloss.NormalBorder()).
+		Padding(0, 1)
+	
+	title := titleStyle.Render("CONSOL CONFLICT RESOLVER")
+	centered := lipgloss.Place(m.viewport.Width, 1, lipgloss.Center, lipgloss.Top, title)
+	return centered + "\n"
 }
 
 func (m model) footerView() string {
