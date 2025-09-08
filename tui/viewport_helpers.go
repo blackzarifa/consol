@@ -8,14 +8,15 @@ import (
 )
 
 const (
-	lineNumWidth = 5
-	spacing      = 2
+	spacing = 2
 )
 
 func (m *model) updateViewportContent() {
 	var lines []string
 	lineNumber := 1
 	state := "normal"
+	
+	lineNumWidth := len(fmt.Sprintf("%d", len(m.normalized)))
 
 	for i, line := range m.normalized {
 		lineType, newState, showLineNumber := processConflictLine(line, state)
@@ -28,7 +29,7 @@ func (m *model) updateViewportContent() {
 		}
 
 		isResolved := i < len(m.resolvedLines) && m.resolvedLines[i]
-		lineNumStr := m.renderLineNumber(lineNumber, showLineNumber, isResolved)
+		lineNumStr := m.renderLineNumber(lineNumber, showLineNumber, isResolved, lineNumWidth)
 		if showLineNumber {
 			lineNumber++
 		}
@@ -46,7 +47,8 @@ func (m *model) renderConflictMessage(screenWidth int) string {
 	messageStyle := lipgloss.NewStyle().
 		Foreground(lipgloss.AdaptiveColor{Dark: "246", Light: "240"}).
 		Width(screenWidth)
-
+	
+	lineNumWidth := len(fmt.Sprintf("%d", len(m.normalized)))
 	messagePrefix := strings.Repeat(" ", lineNumWidth+spacing)
 	acceptMessage := "Accept change (o) | Ignore (t)"
 	conflictNum := fmt.Sprintf(" | Conflict %d/%d", m.currentConflict+1, len(m.conflicts))
@@ -54,7 +56,7 @@ func (m *model) renderConflictMessage(screenWidth int) string {
 	return messageStyle.Render(messagePrefix + acceptMessage + conflictNum)
 }
 
-func (m *model) renderLineNumber(lineNumber int, showLineNumber bool, isResolved bool) string {
+func (m *model) renderLineNumber(lineNumber int, showLineNumber bool, isResolved bool, lineNumWidth int) string {
 	if !showLineNumber {
 		return strings.Repeat(" ", lineNumWidth)
 	}
