@@ -173,5 +173,5 @@ func (m model) footerView() string {
 		return "\n" + m.statusMessage
 	}
 
-	return m.help.View(keyMap{})
+	return "\n" + m.help.View(keyMap{}) + "\n"
 }
