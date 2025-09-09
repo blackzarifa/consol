@@ -155,8 +155,12 @@ func (m model) headerView() string {
 		Padding(0, 1)
 
 	title := titleStyle.Render("Consol Conflict Solver")
-	centered := lipgloss.Place(m.viewport.Width, 1, lipgloss.Center, lipgloss.Top, title)
-	return centered + "\n"
+	
+	centerStyle := lipgloss.NewStyle().
+		Width(m.viewport.Width).
+		Align(lipgloss.Center)
+	
+	return centerStyle.Render(title)
 }
 
 func (m model) footerView() string {
