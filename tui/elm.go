@@ -36,7 +36,7 @@ func (k keyMap) FullHelp() [][]key.Binding {
 		{
 			key.NewBinding(key.WithKeys("p"), key.WithHelp("p", "previous conflict")),
 			key.NewBinding(key.WithKeys("n"), key.WithHelp("n", "next conflict")),
-			key.NewBinding(key.WithKeys("w"), key.WithHelp("w", "save file")),
+			key.NewBinding(key.WithKeys("w"), key.WithHelp("w/ctrl+s", "save file")),
 			key.NewBinding(key.WithKeys("q"), key.WithHelp("q/ctrl+c", "quit")),
 		},
 		{
@@ -75,7 +75,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		m.statusMessage = ""
 		switch msg.String() {
-		case "ctrl+c", "q":
+		case "q", "ctrl+c":
+			return m, tea.Quit
 			return m, tea.Quit
 		case "k", "up":
 			if m.cursor > 0 {
@@ -127,7 +128,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.resolveConflict(cc.Theirs)
 			m.updateViewportContent()
-		case "w":
+		case "w", "ctrl+s":
 			toSave := strings.Join(m.normalized, m.lineEnding) + m.lineEnding
 			os.WriteFile(os.Args[1], []byte(toSave), 0o664)
 			m.statusMessage = "File Saved"
