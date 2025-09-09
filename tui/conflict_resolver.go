@@ -135,15 +135,17 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.updateViewportContent()
 		case "w", "ctrl+s":
 			toSave := strings.Join(m.normalized, m.lineEnding) + m.lineEnding
-			filename := m.filename
-			if filename == "" {
-				filename = os.Args[1]
+			err := os.WriteFile(m.filename, []byte(toSave), 0o664)
+			if err != nil {
+				m.statusMessage = fmt.Sprintf("Error saving file: %v", err)
+			} else {
+				m.statusMessage = "File Saved"
 			}
-			os.WriteFile(filename, []byte(toSave), 0o664)
-			m.statusMessage = "File Saved"
-			cmd = tea.Tick(2*time.Second, func(t time.Time) tea.Msg {
-				return tea.KeyMsg{}
-			})
+
+			cmd = tea.Tick(
+				2*time.Second,
+				func(t time.Time) tea.Msg { return tea.KeyMsg{} },
+			)
 		case "?":
 			m.help.ShowAll = !m.help.ShowAll
 		}
@@ -168,12 +170,12 @@ func (m model) headerView() string {
 		Border(lipgloss.NormalBorder()).
 		Padding(0, 1)
 
-	title := titleStyle.Render("Consol Conflict Solver")
-	
+	title := titleStyle.Render("Consol Conflict reSolver")
+
 	centerStyle := lipgloss.NewStyle().
 		Width(m.viewport.Width).
 		Align(lipgloss.Center)
-	
+
 	return centerStyle.Render(title)
 }
 
