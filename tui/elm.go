@@ -40,6 +40,7 @@ func (k keyMap) FullHelp() [][]key.Binding {
 			key.NewBinding(key.WithKeys("q"), key.WithHelp("q/ctrl+c", "quit")),
 		},
 		{
+			key.NewBinding(key.WithKeys("b"), key.WithHelp("b/esc", "back to file list")),
 			key.NewBinding(key.WithKeys("?"), key.WithHelp("?", "close help")),
 		},
 	}
@@ -51,11 +52,13 @@ type model struct {
 	normalized      []string
 	help            help.Model
 	viewport        viewport.Model
+	filename        string
 	lineEnding      string
 	statusMessage   string
 	currentConflict int
 	cursor          int
 	lastKeyG        bool
+	backToSelector  bool
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -77,6 +80,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "q", "ctrl+c":
 			return m, tea.Quit
+		case "b", "esc":
+			m.backToSelector = true
 			return m, tea.Quit
 		case "k", "up":
 			if m.cursor > 0 {
@@ -130,7 +135,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.updateViewportContent()
 		case "w", "ctrl+s":
 			toSave := strings.Join(m.normalized, m.lineEnding) + m.lineEnding
-			os.WriteFile(os.Args[1], []byte(toSave), 0o664)
+			filename := m.filename
+			if filename == "" {
+				filename = os.Args[1]
+			}
+			os.WriteFile(filename, []byte(toSave), 0o664)
 			m.statusMessage = "File Saved"
 			cmd = tea.Tick(2*time.Second, func(t time.Time) tea.Msg {
 				return tea.KeyMsg{}
