@@ -2,50 +2,46 @@
 package tui
 
 import (
-	"fmt"
-	"os"
-	"strings"
+	"log"
 
 	"github.com/blackzarifa/consol/parser"
+	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-func RunProgram(normalized, lineEnding string, conflicts []parser.Conflict) {
-	normalizedArr := strings.Split(normalized, "\n")
-	if len(normalizedArr) > 0 && normalizedArr[len(normalizedArr)-1] == "" {
-		normalizedArr = normalizedArr[:len(normalizedArr)-1]
-	}
-
+func RunProgram(
+	normalizedArr []string,
+	lineEnding, filename string,
+	conflicts []parser.Conflict,
+) bool {
 	p := tea.NewProgram(
-		initialModel(normalizedArr, lineEnding, conflicts),
+		newConflictResolver(normalizedArr, lineEnding, filename, conflicts),
 		tea.WithAltScreen(),
 		tea.WithMouseCellMotion(),
 	)
-	if _, err := p.Run(); err != nil {
-		fmt.Printf("Alas, there's been an error: %v", err)
-		os.Exit(1)
+	finalModel, err := p.Run()
+	if err != nil {
+		log.Fatalf("Alas, there's been an error: %v", err)
 	}
+
+	if m := finalModel.(model); m.backToSelector {
+		return true
+	}
+	return false
 }
 
-func (m model) Init() tea.Cmd {
-	tea.SetWindowTitle("Consol - Conflict reSolver")
-	return nil
-}
-
-func initialModel(
-	normalizedArr []string, lineEnding string,
+func newConflictResolver(
+	normalizedArr []string,
+	lineEnding, filename string,
 	conflicts []parser.Conflict,
 ) model {
 	initialCursor := 0
-	var currentConflict int
+	currentConflict := 0
 
 	if len(conflicts) > 0 {
 		initialCursor = conflicts[0].StartLine - 1
-		currentConflict = 0
 	}
-
-	vp := viewport.New(50, 25)
 
 	m := model{
 		resolvedLines:   make([]bool, len(normalizedArr)),
@@ -54,7 +50,9 @@ func initialModel(
 		lineEnding:      lineEnding,
 		currentConflict: currentConflict,
 		cursor:          initialCursor,
-		viewport:        vp,
+		viewport:        viewport.New(50, 25),
+		filename:        filename,
+		help:            help.New(),
 	}
 
 	m.updateViewportContent()
