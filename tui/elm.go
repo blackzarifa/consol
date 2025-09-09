@@ -7,15 +7,49 @@ import (
 	"time"
 
 	"github.com/blackzarifa/consol/parser"
+	"github.com/charmbracelet/bubbles/help"
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
+type keyMap struct{}
+
+func (k keyMap) ShortHelp() []key.Binding {
+	return []key.Binding{
+		key.NewBinding(key.WithKeys("k"), key.WithHelp("↑/k", "up")),
+		key.NewBinding(key.WithKeys("j"), key.WithHelp("↓/j", "down")),
+		key.NewBinding(key.WithKeys("w"), key.WithHelp("w", "save")),
+		key.NewBinding(key.WithKeys("?"), key.WithHelp("?", "more")),
+	}
+}
+
+func (k keyMap) FullHelp() [][]key.Binding {
+	return [][]key.Binding{
+		{
+			key.NewBinding(key.WithKeys("k"), key.WithHelp("↑/k", "up")),
+			key.NewBinding(key.WithKeys("j"), key.WithHelp("↓/j", "down")),
+			key.NewBinding(key.WithKeys("g"), key.WithHelp("g/home", "go to start")),
+			key.NewBinding(key.WithKeys("G"), key.WithHelp("G/end", "go to end")),
+		},
+		{
+			key.NewBinding(key.WithKeys("p"), key.WithHelp("p", "previous conflict")),
+			key.NewBinding(key.WithKeys("n"), key.WithHelp("n", "next conflict")),
+			key.NewBinding(key.WithKeys("w"), key.WithHelp("w", "save file")),
+			key.NewBinding(key.WithKeys("q"), key.WithHelp("q/ctrl+c", "quit")),
+		},
+		{
+			key.NewBinding(key.WithKeys("?"), key.WithHelp("?", "close help")),
+		},
+	}
+}
+
 type model struct {
 	resolvedLines   []bool
 	conflicts       []parser.Conflict
 	normalized      []string
+	help            help.Model
 	viewport        viewport.Model
 	lineEnding      string
 	statusMessage   string
@@ -100,6 +134,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			cmd = tea.Tick(2*time.Second, func(t time.Time) tea.Msg {
 				return tea.KeyMsg{}
 			})
+		case "?":
+			m.help.ShowAll = !m.help.ShowAll
 		}
 
 	}
@@ -127,9 +163,5 @@ func (m model) footerView() string {
 		return "\n" + m.statusMessage
 	}
 
-	footer := "\n'w' to save | 'q' to quit  |  'jknp' to navigate"
-	if m.lastKeyG {
-		footer += "  |  'g' - Press again to go to the beginning"
-	}
-	return footer
+	return m.help.View(keyMap{})
 }
