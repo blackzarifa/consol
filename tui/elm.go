@@ -144,6 +144,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
+func (m model) Init() tea.Cmd {
+	tea.SetWindowTitle("Consol - Conflict reSolver")
+	return nil
+}
+
 func (m model) View() string {
 	return fmt.Sprintf("%s\n%s\n%s", m.headerView(), m.viewport.View(), m.footerView())
 }
