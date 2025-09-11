@@ -2,9 +2,6 @@ package tui
 
 import (
 	"fmt"
-	"os"
-	"strings"
-	"time"
 
 	"github.com/blackzarifa/consol/parser"
 	"github.com/charmbracelet/bubbles/help"
@@ -83,73 +80,23 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "b", "esc":
 			m.backToSelector = true
 			return m, tea.Quit
-		case "k", "up":
-			if m.cursor > 0 {
-				m.cursor--
-				m.cursorToConflict()
-				m.updateViewportContent()
-			}
-		case "j", "down":
-			if m.cursor < len(m.normalized)-1 {
-				m.cursor++
-				m.cursorToConflict()
-				m.updateViewportContent()
-			}
-		case "g", "home":
-			if msg.String() == "g" && !m.lastKeyG {
-				m.lastKeyG = true
-				break
-			}
-			m.lastKeyG = false
-			m.cursor = 0
-			m.updateViewportContent()
-		case "G", "end":
-			m.cursor = len(m.normalized) - 1
-			m.updateViewportContent()
-		case "n", "p":
-			if msg.String() == "n" {
-				if m.currentConflict >= len(m.conflicts)-1 {
-					break
-				}
-				m.currentConflict++
-			} else {
-				if m.currentConflict <= 0 {
-					break
-				}
-				m.currentConflict--
-			}
-			m.cursor = m.conflicts[m.currentConflict].StartLine - 1
-			m.updateViewportContent()
-		case "o", "t":
-			if len(m.conflicts) == 0 {
-				break
-			}
-			cc := m.conflicts[m.currentConflict]
-
-			if msg.String() == "o" {
-				m.resolveConflict(cc.Ours)
-				m.updateViewportContent()
-				break
-			}
-			m.resolveConflict(cc.Theirs)
-			m.updateViewportContent()
-		case "w", "ctrl+s":
-			toSave := strings.Join(m.normalized, m.lineEnding) + m.lineEnding
-			err := os.WriteFile(m.filename, []byte(toSave), 0o664)
-			if err != nil {
-				m.statusMessage = fmt.Sprintf("Error saving file: %v", err)
-			} else {
-				m.statusMessage = "File Saved"
-			}
-
-			cmd = tea.Tick(
-				2*time.Second,
-				func(t time.Time) tea.Msg { return tea.KeyMsg{} },
-			)
 		case "?":
 			m.help.ShowAll = !m.help.ShowAll
+		case "k", "up":
+			m = m.moveCursorUp()
+		case "j", "down":
+			m = m.moveCursorDown()
+		case "g", "home":
+			m = m.handleGoToStart(msg)
+		case "G", "end":
+			m = m.goToEnd()
+		case "n", "p":
+			m = m.navigateConflict(msg.String())
+		case "o", "t":
+			m = m.resolveCurrentConflict(msg.String())
+		case "w", "ctrl+s":
+			m, cmd = m.saveFile()
 		}
-
 	}
 
 	return m, cmd

@@ -1,10 +1,14 @@
 package tui
 
 import (
+	"fmt"
+	"os"
 	"slices"
 	"strings"
+	"time"
 
 	"github.com/blackzarifa/consol/parser"
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 func RemoveIndex[T any](slice []T, index int) []T {
@@ -92,4 +96,90 @@ func (m *model) cursorToConflict() {
 			m.currentConflict = i
 		}
 	}
+}
+
+// Navigation actions
+func (m model) moveCursorUp() model {
+	if m.cursor > 0 {
+		m.cursor--
+		m.cursorToConflict()
+		m.updateViewportContent()
+	}
+	return m
+}
+
+func (m model) moveCursorDown() model {
+	if m.cursor < len(m.normalized)-1 {
+		m.cursor++
+		m.cursorToConflict()
+		m.updateViewportContent()
+	}
+	return m
+}
+
+func (m model) handleGoToStart(msg tea.KeyMsg) model {
+	if msg.String() == "g" && !m.lastKeyG {
+		m.lastKeyG = true
+		return m
+	}
+	m.lastKeyG = false
+	m.cursor = 0
+	m.updateViewportContent()
+	return m
+}
+
+func (m model) goToEnd() model {
+	m.cursor = len(m.normalized) - 1
+	m.updateViewportContent()
+	return m
+}
+
+// Conflict navigation and resolution actions
+func (m model) navigateConflict(direction string) model {
+	if direction == "n" {
+		if m.currentConflict >= len(m.conflicts)-1 {
+			return m
+		}
+		m.currentConflict++
+	} else {
+		if m.currentConflict <= 0 {
+			return m
+		}
+		m.currentConflict--
+	}
+	m.cursor = m.conflicts[m.currentConflict].StartLine - 1
+	m.updateViewportContent()
+	return m
+}
+
+func (m model) resolveCurrentConflict(choice string) model {
+	if len(m.conflicts) == 0 {
+		return m
+	}
+	cc := m.conflicts[m.currentConflict]
+
+	if choice == "o" {
+		m.resolveConflict(cc.Ours)
+	} else {
+		m.resolveConflict(cc.Theirs)
+	}
+	m.updateViewportContent()
+	return m
+}
+
+// File operations
+func (m model) saveFile() (model, tea.Cmd) {
+	toSave := strings.Join(m.normalized, m.lineEnding) + m.lineEnding
+	err := os.WriteFile(m.filename, []byte(toSave), 0o664)
+	if err != nil {
+		m.statusMessage = fmt.Sprintf("Error saving file: %v", err)
+	} else {
+		m.statusMessage = "File Saved"
+	}
+
+	cmd := tea.Tick(
+		2*time.Second,
+		func(t time.Time) tea.Msg { return tea.KeyMsg{} },
+	)
+	return m, cmd
 }
