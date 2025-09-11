@@ -98,6 +98,11 @@ func (m *model) cursorToConflict() {
 	}
 }
 
+// renderHeader creates a consistent left-aligned header for all TUI pages
+func renderHeader() string {
+	return HeaderTitleStyle.Render("Consol Conflict reSolver")
+}
+
 // Navigation actions
 func (m model) moveCursorUp() model {
 	if m.cursor > 0 {

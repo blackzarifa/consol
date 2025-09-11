@@ -21,8 +21,6 @@ var (
 				Border(lipgloss.NormalBorder()).
 				Padding(0, 1)
 
-	HeaderCenterStyle = lipgloss.NewStyle().Align(lipgloss.Center)
-
 	ConflictMessageStyle = lipgloss.NewStyle().
 				Foreground(lipgloss.AdaptiveColor{Dark: ColorDarkGray, Light: ColorLightGray})
 

@@ -112,11 +112,7 @@ func (m model) View() string {
 }
 
 func (m model) headerView() string {
-	title := HeaderTitleStyle.Render("Consol Conflict reSolver")
-
-	centerStyle := HeaderCenterStyle.Width(m.viewport.Width)
-
-	return centerStyle.Render(title)
+	return renderHeader()
 }
 
 func (m model) footerView() string {
