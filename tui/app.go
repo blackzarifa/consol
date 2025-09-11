@@ -10,7 +10,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-func RunProgram(
+func RunConflictResolver(
 	normalizedArr []string,
 	lineEnding, filename string,
 	conflicts []parser.Conflict,

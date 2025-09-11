@@ -39,6 +39,6 @@ func processFile(filename string) {
 		normalizedArr = normalizedArr[:lastLine]
 	}
 
-	tui.RunProgram(normalizedArr, lineEnding, filename, conflicts)
+	tui.RunConflictResolver(normalizedArr, lineEnding, filename, conflicts)
 }
 }
