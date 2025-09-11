@@ -165,16 +165,9 @@ func (m model) View() string {
 }
 
 func (m model) headerView() string {
-	titleStyle := lipgloss.NewStyle().
-		Bold(true).
-		Border(lipgloss.NormalBorder()).
-		Padding(0, 1)
+	title := HeaderTitleStyle.Render("Consol Conflict reSolver")
 
-	title := titleStyle.Render("Consol Conflict reSolver")
-
-	centerStyle := lipgloss.NewStyle().
-		Width(m.viewport.Width).
-		Align(lipgloss.Center)
+	centerStyle := HeaderCenterStyle.Width(m.viewport.Width)
 
 	return centerStyle.Render(title)
 }
