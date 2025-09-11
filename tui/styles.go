@@ -52,4 +52,6 @@ var (
 	TheirsContentStyle = lipgloss.NewStyle().
 				Background(lipgloss.Color(ColorBlue)).
 				Foreground(lipgloss.Color(ColorWhite))
+
+	BlankStyle = lipgloss.NewStyle()
 )
