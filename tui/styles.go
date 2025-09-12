@@ -37,21 +37,21 @@ var (
 
 	OursBranchStyle = lipgloss.NewStyle().
 			Background(lipgloss.Color(ColorDarkGreen)).
-			Foreground(lipgloss.Color(ColorWhite)).
+			Foreground(lipgloss.AdaptiveColor{Dark: ColorWhite, Light: ColorBrightWhite}).
 			Bold(true)
 
 	TheirsBranchStyle = lipgloss.NewStyle().
 				Background(lipgloss.Color(ColorDarkBlue)).
-				Foreground(lipgloss.Color(ColorWhite)).
+				Foreground(lipgloss.AdaptiveColor{Dark: ColorWhite, Light: ColorBrightWhite}).
 				Bold(true)
 
 	OursContentStyle = lipgloss.NewStyle().
 				Background(lipgloss.Color(ColorGreen)).
-				Foreground(lipgloss.Color(ColorWhite))
+				Foreground(lipgloss.AdaptiveColor{Dark: ColorWhite, Light: ColorBrightWhite})
 
 	TheirsContentStyle = lipgloss.NewStyle().
 				Background(lipgloss.Color(ColorBlue)).
-				Foreground(lipgloss.Color(ColorWhite))
+				Foreground(lipgloss.AdaptiveColor{Dark: ColorWhite, Light: ColorBrightWhite})
 
 	BlankStyle = lipgloss.NewStyle()
 )
