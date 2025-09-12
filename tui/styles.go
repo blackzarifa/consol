@@ -54,4 +54,19 @@ var (
 				Foreground(lipgloss.AdaptiveColor{Dark: ColorWhite, Light: ColorBrightWhite})
 
 	BlankStyle = lipgloss.NewStyle()
+
+	FileListNormalTitleStyle = lipgloss.NewStyle().
+					Foreground(lipgloss.AdaptiveColor{Dark: ColorWhite, Light: ColorBlack})
+
+	FileListNormalDescStyle = lipgloss.NewStyle().
+				Foreground(lipgloss.AdaptiveColor{Dark: ColorDarkGray, Light: ColorLightGray})
+
+	FileListSelectedTitleStyle = lipgloss.NewStyle().
+					Foreground(lipgloss.AdaptiveColor{Dark: ColorWhite, Light: ColorBlack}).
+					BorderLeftForeground(lipgloss.AdaptiveColor{Dark: ColorWhite, Light: ColorBlack}).
+					Bold(true)
+
+	FileListSelectedDescStyle = lipgloss.NewStyle().
+					Foreground(lipgloss.AdaptiveColor{Dark: ColorDarkGray, Light: ColorLightGray}).
+					BorderLeftForeground(lipgloss.AdaptiveColor{Dark: ColorWhite, Light: ColorBlack})
 )
