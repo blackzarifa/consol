@@ -31,7 +31,7 @@ var (
 	ResolvedLineNumStyle = lipgloss.NewStyle().
 				Foreground(lipgloss.Color(ColorYellow)).
 				BorderRight(true).
-				BorderStyle(lipgloss.NormalBorder()).
+				BorderStyle(lipgloss.ThickBorder()).
 				BorderForeground(lipgloss.Color(ColorYellow))
 
 	CursorStyle = lipgloss.NewStyle().
@@ -61,20 +61,34 @@ var (
 
 	FileListNormalTitleStyle = lipgloss.NewStyle().
 					Foreground(lipgloss.AdaptiveColor{Dark: ColorWhite, Light: ColorBlack}).
-					Padding(0, 3)
+					BorderLeft(true).
+					BorderStyle(lipgloss.ThickBorder()).
+					BorderLeftForeground(lipgloss.AdaptiveColor{Dark: ColorDarkGray, Light: ColorLightGray}).
+					Padding(0, 2).
+					Margin(0, 1)
 
 	FileListNormalDescStyle = lipgloss.NewStyle().
 				Foreground(lipgloss.AdaptiveColor{Dark: ColorDarkGray, Light: ColorLightGray}).
-				Padding(0, 3)
+				BorderLeft(true).
+				BorderStyle(lipgloss.ThickBorder()).
+				BorderLeftForeground(lipgloss.AdaptiveColor{Dark: ColorDarkGray, Light: ColorLightGray}).
+				Padding(0, 2).
+				Margin(0, 1)
 
 	FileListSelectedTitleStyle = lipgloss.NewStyle().
 					Foreground(lipgloss.AdaptiveColor{Dark: ColorWhite, Light: ColorBlack}).
+					BorderLeft(true).
+					BorderStyle(lipgloss.ThickBorder()).
 					BorderLeftForeground(lipgloss.AdaptiveColor{Dark: ColorWhite, Light: ColorBlack}).
 					Bold(true).
-					Padding(0, 3)
+					Padding(0, 2).
+					Margin(0, 1)
 
 	FileListSelectedDescStyle = lipgloss.NewStyle().
 					Foreground(lipgloss.AdaptiveColor{Dark: ColorDarkGray, Light: ColorLightGray}).
+					BorderLeft(true).
+					BorderStyle(lipgloss.ThickBorder()).
 					BorderLeftForeground(lipgloss.AdaptiveColor{Dark: ColorWhite, Light: ColorBlack}).
-					Padding(0, 3)
+					Padding(0, 2).
+					Margin(0, 1)
 )
