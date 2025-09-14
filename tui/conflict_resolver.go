@@ -103,7 +103,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) Init() tea.Cmd {
-	tea.SetWindowTitle("Consol - Conflict reSolver")
 	return nil
 }
 
