@@ -12,14 +12,28 @@ import (
 
 func main() {
 	if len(os.Args) >= 2 {
-		processFile(os.Args[1])
+		handleFile(os.Args[1])
 		return
 	}
 
-	file, err := os.ReadFile(os.Args[1])
+	for {
+		filename, err := selectFile()
+		if err != nil {
+			fmt.Printf("Error: %v\n", err)
+			return
+		}
+		if filename == "" {
+			return
+		}
+
+		backToSelector := handleFile(filename)
+		if !backToSelector {
+			return
+		}
+	}
 }
 
-func processFile(filename string) {
+func handleFile(filename string) bool {
 	file, err := os.ReadFile(filename)
 	if err != nil {
 		log.Fatal(err)
@@ -28,7 +42,7 @@ func processFile(filename string) {
 
 	if !parser.HasConflict(content) {
 		fmt.Println("No conflicts found in file.")
-		return
+		return true
 	}
 
 	conflicts, normalized, lineEnding := parser.ParseFile(content)
@@ -39,6 +53,38 @@ func processFile(filename string) {
 		normalizedArr = normalizedArr[:lastLine]
 	}
 
-	tui.RunConflictResolver(normalizedArr, lineEnding, filename, conflicts)
+	return tui.RunConflictResolver(normalizedArr, lineEnding, filename, conflicts)
 }
+
+func selectFile() (string, error) {
+	files, err := findConflictFiles()
+	if err != nil {
+		return "", fmt.Errorf("finding conflict files: %v", err)
+	}
+
+	files = append(files, "test-conflict.txt")
+	files = append(files, "test-1.txt")
+
+	if len(files) == 0 {
+		fmt.Println("No git conflict files found in this repository.")
+		return "", nil
+	}
+
+	conflictCounts := make([]int, len(files))
+	for i, filename := range files {
+		content, err := os.ReadFile(filename)
+		if err != nil {
+			conflictCounts[i] = 0
+			continue
+		}
+
+		if parser.HasConflict(string(content)) {
+			conflicts, _, _ := parser.ParseFile(string(content))
+			conflictCounts[i] = len(conflicts)
+		} else {
+			conflictCounts[i] = 0
+		}
+	}
+
+	return tui.RunFileSelector(files, conflictCounts)
 }
