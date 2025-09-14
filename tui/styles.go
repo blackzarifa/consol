@@ -19,7 +19,11 @@ var (
 	HeaderTitleStyle = lipgloss.NewStyle().
 				Bold(true).
 				Border(lipgloss.NormalBorder()).
-				Padding(0, 1)
+				Padding(0, 1).
+				Margin(0, 1)
+
+	FooterStyle = lipgloss.NewStyle().
+			Margin(0, 1)
 
 	ConflictMessageStyle = lipgloss.NewStyle().
 				Foreground(lipgloss.AdaptiveColor{Dark: ColorDarkGray, Light: ColorLightGray})
@@ -56,17 +60,21 @@ var (
 	BlankStyle = lipgloss.NewStyle()
 
 	FileListNormalTitleStyle = lipgloss.NewStyle().
-					Foreground(lipgloss.AdaptiveColor{Dark: ColorWhite, Light: ColorBlack})
+					Foreground(lipgloss.AdaptiveColor{Dark: ColorWhite, Light: ColorBlack}).
+					Padding(0, 3)
 
 	FileListNormalDescStyle = lipgloss.NewStyle().
-				Foreground(lipgloss.AdaptiveColor{Dark: ColorDarkGray, Light: ColorLightGray})
+				Foreground(lipgloss.AdaptiveColor{Dark: ColorDarkGray, Light: ColorLightGray}).
+				Padding(0, 3)
 
 	FileListSelectedTitleStyle = lipgloss.NewStyle().
 					Foreground(lipgloss.AdaptiveColor{Dark: ColorWhite, Light: ColorBlack}).
 					BorderLeftForeground(lipgloss.AdaptiveColor{Dark: ColorWhite, Light: ColorBlack}).
-					Bold(true)
+					Bold(true).
+					Padding(0, 3)
 
 	FileListSelectedDescStyle = lipgloss.NewStyle().
 					Foreground(lipgloss.AdaptiveColor{Dark: ColorDarkGray, Light: ColorLightGray}).
-					BorderLeftForeground(lipgloss.AdaptiveColor{Dark: ColorWhite, Light: ColorBlack})
+					BorderLeftForeground(lipgloss.AdaptiveColor{Dark: ColorWhite, Light: ColorBlack}).
+					Padding(0, 3)
 )

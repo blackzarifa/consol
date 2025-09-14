@@ -116,8 +116,8 @@ func (m model) headerView() string {
 
 func (m model) footerView() string {
 	if m.statusMessage != "" {
-		return "\n" + m.statusMessage
+		return FooterStyle.Render("\n" + m.statusMessage)
 	}
 
-	return "\n" + m.help.View(keyMap{}) + "\n"
+	return FooterStyle.Render("\n" + m.help.View(keyMap{}) + "\n")
 }
