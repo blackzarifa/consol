@@ -1,3 +1,4 @@
+// Package tui runs the terminal interface using bubbletea
 package tui
 
 import (
