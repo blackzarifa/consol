@@ -23,6 +23,17 @@ func main() {
 			showUsage()
 			return
 		default:
+			if _, err := os.Stat(arg); err == nil {
+				handleFile(arg)
+				return
+			}
+
+			if strings.HasPrefix(arg, "-") {
+				fmt.Printf("Unknown flag: %s\n\n", arg)
+				showUsage()
+				return
+			}
+
 			handleFile(arg)
 			return
 		}
@@ -46,7 +57,7 @@ func main() {
 }
 
 func showUsage() {
-	fmt.Println("Usage: consol [file]")
+	fmt.Println("Usage: consol <file>")
 	fmt.Println("\nInteractive Git merge conflict resolver")
 	fmt.Println("\nCommands:")
 	fmt.Println("  consol              - Auto-discover and select conflict files")
