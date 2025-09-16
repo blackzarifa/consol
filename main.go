@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"strings"
 
@@ -10,10 +9,23 @@ import (
 	"github.com/blackzarifa/consol/tui"
 )
 
+var version = "dev"
+
 func main() {
 	if len(os.Args) >= 2 {
-		handleFile(os.Args[1])
-		return
+		arg := os.Args[1]
+
+		switch arg {
+		case "--version", "-v":
+			fmt.Printf("consol %s\n", version)
+			return
+		case "--help", "-h":
+			showUsage()
+			return
+		default:
+			handleFile(arg)
+			return
+		}
 	}
 
 	for {
@@ -33,10 +45,21 @@ func main() {
 	}
 }
 
+func showUsage() {
+	fmt.Println("Usage: consol [file]")
+	fmt.Println("\nInteractive Git merge conflict resolver")
+	fmt.Println("\nCommands:")
+	fmt.Println("  consol              - Auto-discover and select conflict files")
+	fmt.Println("  consol <file>       - Resolve conflicts in specific file")
+	fmt.Println("  consol --version    - Show version")
+	fmt.Println("  consol --help       - Show this help")
+}
+
 func handleFile(filename string) bool {
 	file, err := os.ReadFile(filename)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Printf("Error: Cannot read file '%s': %v\n", filename, err)
+		return false
 	}
 	content := string(file)
 
