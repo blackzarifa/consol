@@ -62,9 +62,6 @@ func selectFile() (string, error) {
 		return "", fmt.Errorf("finding conflict files: %v", err)
 	}
 
-	files = append(files, "test-conflict.txt")
-	files = append(files, "test-1.txt")
-
 	if len(files) == 0 {
 		fmt.Println("No git conflict files found in this repository.")
 		return "", nil
