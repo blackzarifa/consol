@@ -12,8 +12,6 @@ for resolving conflicts line by line.
 
 ## Installation
 
-### Manual Installation
-
 **macOS (Apple Silicon):**
 
 ```bash
