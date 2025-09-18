@@ -82,3 +82,6 @@ consol filename.txt
 
 ## Screenshots
 
+<img width="1458" height="913" alt="image" src="https://github.com/user-attachments/assets/75dcd371-a36d-462a-bb59-387c54fc634d" />
+
+<img width="1458" height="913" alt="image" src="https://github.com/user-attachments/assets/482ec069-f07e-44b6-96ff-447e45442187" />
