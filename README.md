@@ -12,6 +12,17 @@ for resolving conflicts line by line.
 
 ## Installation
 
+### npm
+
+```bash
+npm install -g git-consol
+```
+
+This automatically downloads the correct binary for your platform and handles
+PATH setup.
+
+### Manual Installation
+
 **macOS (Apple Silicon):**
 
 ```bash
