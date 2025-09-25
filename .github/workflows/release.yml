@@ -24,20 +24,23 @@ jobs:
 
       - name: Build binaries
         run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          LDFLAGS="-X main.version=$VERSION"
+
           # Linux AMD64
-          GOOS=linux GOARCH=amd64 go build -o consol-linux-amd64 .
+          GOOS=linux GOARCH=amd64 go build -ldflags "$LDFLAGS" -o consol-linux-amd64 .
 
           # Linux ARM64
-          GOOS=linux GOARCH=arm64 go build -o consol-linux-arm64 .
+          GOOS=linux GOARCH=arm64 go build -ldflags "$LDFLAGS" -o consol-linux-arm64 .
 
           # macOS Intel
-          GOOS=darwin GOARCH=amd64 go build -o consol-darwin-amd64 .
+          GOOS=darwin GOARCH=amd64 go build -ldflags "$LDFLAGS" -o consol-darwin-amd64 .
 
           # macOS Apple Silicon
-          GOOS=darwin GOARCH=arm64 go build -o consol-darwin-arm64 .
+          GOOS=darwin GOARCH=arm64 go build -ldflags "$LDFLAGS" -o consol-darwin-arm64 .
 
           # Windows AMD64
-          GOOS=windows GOARCH=amd64 go build -o consol-windows-amd64.exe .
+          GOOS=windows GOARCH=amd64 go build -ldflags "$LDFLAGS" -o consol-windows-amd64.exe .
 
       - name: Generate checksums
         run: |
