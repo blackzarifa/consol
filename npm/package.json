@@ -1,0 +1,38 @@
+{
+  "name": "git-consol",
+  "version": "1.0.1",
+  "description": "Git merge conflict resolution TUI",
+  "keywords": [
+    "git",
+    "merge",
+    "conflict",
+    "tui",
+    "cli"
+  ],
+  "author": "blackzarifa",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/blackzarifa/consol.git"
+  },
+  "bugs": {
+    "url": "https://github.com/blackzarifa/consol/issues"
+  },
+  "homepage": "https://github.com/blackzarifa/consol#readme",
+  "type": "module",
+  "bin": {
+    "consol": "cli.js"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "scripts": {
+    "postinstall": "node download-binary.js"
+  },
+  "files": [
+    "cli.js",
+    "download-binary.js",
+    "platform.js",
+    "package.json"
+  ]
+}
